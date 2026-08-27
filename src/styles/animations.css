@@ -1,0 +1,55 @@
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(22, 101, 52, 0.35); } 100% { box-shadow: 0 0 0 8px rgba(22, 101, 52, 0); } }
+@keyframes ripple { to { transform: scale(3); opacity: 0; } }
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes heartPulse { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1); } }
+@keyframes checkPop { 0% { transform: scale(0.7); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+
+.fc-fade-in { animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fc-slide-up { animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fc-slide-down { animation: slideDown 0.18s ease both; }
+.fc-slide-right { animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fc-slide-left { animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fc-scale-in { animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fc-float { animation: floatY 4s ease-in-out infinite; }
+.fc-heart-pulse { animation: heartPulse 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.fc-check-pop { animation: checkPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.fc-page-transition { animation: fadeIn 0.2s ease, slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Global 150-250ms interactive transition presets */
+.fc-transition-fast { transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
+.fc-transition-normal { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.fc-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.fc-ripple-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0);
+  animation: ripple 0.5s ease-out;
+  pointer-events: none;
+}
+
+/* Accessibility: Respect user settings for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
