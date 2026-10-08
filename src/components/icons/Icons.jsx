@@ -12,6 +12,8 @@ export const Heart = ({ size = 15, filled = false }) => (<svg {...base(size)} fi
 export const Minus = ({ size = 14 }) => (<svg {...base(size)}><path d="M5 12h14" /></svg>);
 export const Plus = ({ size = 14 }) => (<svg {...base(size)}><path d="M5 12h14M12 5v14" /></svg>);
 export const Trash = ({ size = 15 }) => (<svg {...base(size)}><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>);
+export const Trash2 = Trash;
+export const Calculator = ({ size = 16 }) => (<svg {...base(size)}><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="16" y1="14" x2="16" y2="18" /><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" /></svg>);
 export const Truck = ({ size = 16 }) => (<svg {...base(size)}><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></svg>);
 export const Check = ({ size = 14 }) => (<svg {...base(size)}><path d="M20 6 9 17l-5-5" /></svg>);
 export const X = ({ size = 16 }) => (<svg {...base(size)}><path d="M18 6 6 18M6 6l12 12" /></svg>);
@@ -47,6 +49,10 @@ export const Star = ({ size = 16, color = "currentColor" }) => (
 
 export const Info = ({ size = 16 }) => (
   <svg {...base(size)}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+);
+
+export const Clock = ({ size = 16 }) => (
+  <svg {...base(size)}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
 );
 
 export const ArrowLeft = ({ size = 16 }) => (
@@ -117,7 +123,35 @@ export const Map = ({ size = 16 }) => (
   <svg {...base(size)}><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
 );
 
+export const Wrench = ({ size = 16 }) => (
+  <svg {...base(size)}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>
+);
+
+export const Droplets = ({ size = 16 }) => (
+  <svg {...base(size)}><path d="M7 16.3c2.2 0 4-1.8 4-4 0-3.3-4-6.3-4-6.3S3 9 3 12.3c0 2.2 1.8 4 4 4z" /><path d="M17 21c2.8 0 5-2.2 5-5 0-4.2-5-8-5-8s-5 3.8-5 8c0 2.8 2.2 5 5 5z" /></svg>
+);
+
+export const ShieldAlert = ({ size = 16 }) => (
+  <svg {...base(size)}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+);
+
+export const Sparkles = ({ size = 16, color = "currentColor" }) => (
+  <svg {...base(size)} stroke={color}><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" /></svg>
+);
+
+export const ExternalLink = ({ size = 14 }) => (
+  <svg {...base(size)}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+);
+
+export const DollarSign = ({ size = 16 }) => (
+  <svg {...base(size)}><line x1="12" y1="2" x2="12" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+);
+
+export const CloudRain = ({ size = 16 }) => (
+  <svg {...base(size)}><path d="M4 14.89 4.41 19M8 14.89 8.41 19M12 14.89 12.41 19M16 14.89 16.41 19" /><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" /></svg>
+);
+
 const Icons = {
-  Sprout, Search, Bell, Cart, Heart, Minus, Plus, Trash, Truck, Check, X, Edit, Sun, Moon, Globe, ChevronDown, Menu, Package, TrendingUp, TrendingDown, ShoppingBag, ClipboardList, AlertTriangle, MapPin, Store, Tractor, CreditCard, CheckCircle, XCircle, Loader, RefreshCw, Star, Info, ArrowLeft, ArrowRight, User, Lock, Eye, EyeOff, Filter, Sliders, Calendar, Download, ShieldCheck, HelpCircle, FileText, MessageSquare, Compass, Navigation, Map
+  Sprout, Search, Bell, Cart, Heart, Minus, Plus, Trash, Truck, Check, X, Edit, Sun, Moon, Globe, ChevronDown, Menu, Package, TrendingUp, TrendingDown, ShoppingBag, ClipboardList, AlertTriangle, MapPin, Store, Tractor, CreditCard, CheckCircle, XCircle, Loader, RefreshCw, Star, Info, ArrowLeft, ArrowRight, User, Lock, Eye, EyeOff, Filter, Sliders, Calendar, Download, ShieldCheck, HelpCircle, FileText, MessageSquare, Compass, Navigation, Map, Wrench
 };
 export default Icons;

@@ -22,6 +22,7 @@ import { formatCurrency, formatDate } from "../../utils/formatters.js";
 import { useData } from "../../hooks/useData.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
+import { getOrderStatusLabel, getCategoryLabel, getUnitLabel, getGradeLabel } from "../../utils/controlledVocabulary.js";
 
 const STATUS_FILTERS = [
   "All",
@@ -64,7 +65,7 @@ function getStatusBadgeVariant(status) {
 }
 
 function OrderHistoryBase() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { orders, products, loading } = useData();
   const { vendorProfile } = useAuth();
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ function OrderHistoryBase() {
                 onClick={() => setStatusFilter(s)}
                 style={{ fontSize: "12px", padding: "6px 14px" }}
               >
-                {s === "All" ? t("all") : s}
+                {s === "All" ? t("all") : getOrderStatusLabel(s, lang)}
               </button>
             ))}
           </div>
@@ -267,13 +268,13 @@ function OrderHistoryBase() {
                           <div>
                             <strong style={{ fontSize: 13 }}>{prod?.name || "Crop Lot"}</strong>
                             <div className="fc-soft" style={{ fontSize: 10.5 }}>
-                              Grade {prod?.grade || "A"} • {prod?.category || "Produce"}
+                              {prod?.translatedGrade || getGradeLabel(prod?.grade, lang)} • {prod?.translatedCategory || getCategoryLabel(prod?.category, lang)}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td>
-                        <strong>{o.qty}</strong> {prod?.unit || "units"}
+                        <strong>{o.qty}</strong> {prod?.translatedUnit || getUnitLabel(prod?.unit, lang)}
                       </td>
                       <td>
                         <strong style={{ fontFamily: "var(--font-heading)", color: "var(--brand)" }}>
@@ -297,7 +298,7 @@ function OrderHistoryBase() {
                         {o.paymentMethod || "COD"}
                       </td>
                       <td>
-                        <Badge variant={badgeVariant}>{o.status}</Badge>
+                        <Badge variant={badgeVariant}>{getOrderStatusLabel(o.status, lang)}</Badge>
                       </td>
                     </tr>
                   );

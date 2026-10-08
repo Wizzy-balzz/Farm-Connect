@@ -4,14 +4,18 @@ import {
   StatCard,
   Button,
   Card,
-  Badge,
   Avatar,
-  EmptyState,
 } from "../../components/common/index.js";
 import { OnboardingModal } from "../../components/common/OnboardingModal.jsx";
+import { SmartInsightsSection } from "../../components/farmer/SmartInsightsSection.jsx";
+import { FarmDecisionEngine } from "../../components/farmer/FarmDecisionEngine.jsx";
 import { BarChart } from "../../components/charts/BarChart.jsx";
 import { DonutChart } from "../../components/charts/DonutChart.jsx";
 import { LineChart } from "../../components/charts/LineChart.jsx";
+import { AnalyticsDashboard } from "../../components/analytics/AnalyticsDashboard.jsx";
+import { Modal } from "../../components/common/Modal.jsx";
+import { FarmCopilotDashboard } from "../../components/ai/FarmCopilotDashboard.jsx";
+import { AiActionCenter } from "../../components/ai/AiActionCenter.jsx";
 import { apiFetch } from "../../services/api.js";
 import {
   TrendingUp,
@@ -29,33 +33,37 @@ import { useLanguage } from "../../hooks/useLanguage.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
 
 function FarmerDashboardBase() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const { farmerProfile } = useAuth();
   const { products, orders } = useData();
   const { notifications } = useNotifications();
   const navigate = useNavigate();
 
-  const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const [copilotInsights, setCopilotInsights] = useState([]);
-
-  useEffect(() => {
-    apiFetch("/api/ai/farmer-copilot")
-      .then((data) => {
-        if (data && data.insights) setCopilotInsights(data.insights);
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
+  const [onboardingOpen, setOnboardingOpen] = useState(() => {
     try {
       const shown = localStorage.getItem("fc_onboarding_done");
       if (!shown) {
-        setOnboardingOpen(true);
         localStorage.setItem("fc_onboarding_done", "true");
+        return true;
       }
     } catch {
       /* noop */
     }
+    return false;
+  });
+  const [actionCenterOpen, setActionCenterOpen] = useState(false);
+  const [copilotInsights, setCopilotInsights] = useState([]);
+
+  useEffect(() => {
+    let isSubscribed = true;
+    apiFetch("/api/ai/farmer-copilot")
+      .then((data) => {
+        if (isSubscribed && data && data.insights) setCopilotInsights(data.insights);
+      })
+      .catch(() => {});
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
 
   const [now, setNow] = useState(() => new Date());
@@ -268,16 +276,44 @@ function FarmerDashboardBase() {
             </p>
           </div>
 
-          <Button
-            variant="accent"
-            size="md"
-            onClick={() => navigate("/farmer/products/add")}
-            style={{ fontWeight: 700, boxShadow: "var(--shadow-sm)" }}
-          >
-            <Plus size={15} /> List New Harvest
-          </Button>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => navigate("/farmer/crop-health")}
+              style={{ background: "rgba(255,255,255,0.15)", color: "#ffffff", borderColor: "rgba(255,255,255,0.35)", fontWeight: 600 }}
+            >
+              🌱 Crop Health AI
+            </Button>
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => navigate("/farmer/sell-smarter")}
+              style={{ background: "rgba(255,255,255,0.15)", color: "#ffffff", borderColor: "rgba(255,255,255,0.35)", fontWeight: 600 }}
+            >
+              🛒 Sell Smarter AI
+            </Button>
+            <Button
+              variant="accent"
+              size="md"
+              onClick={() => navigate("/farmer/products/add")}
+              style={{ fontWeight: 700, boxShadow: "var(--shadow-sm)" }}
+            >
+              <Plus size={15} /> List New Harvest
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Signature FarmConnect Product Hallmark: Crop → Price → Demand → Location → Decision Flow */}
+      <FarmDecisionEngine
+        farmerProfile={farmerProfile}
+        myProducts={myProducts}
+        onOpenActionCenter={() => setActionCenterOpen(true)}
+      />
+
+      {/* Phase 7: Proactive AI Agricultural Insights & Smart Alerts */}
+      <SmartInsightsSection />
 
       {/* Metrics Grid */}
       <div className="fc-stat-grid" style={{ marginBottom: "24px" }}>
@@ -311,6 +347,60 @@ function FarmerDashboardBase() {
           bg="var(--danger-light)"
           trend={pendingCount > 0 ? { direction: "down", text: "Requires action" } : undefined}
         />
+      </div>
+
+      {/* 🌾 Phase 11 AI Farming Personal Copilot Dashboard */}
+      <div style={{ marginBottom: "24px" }}>
+        <FarmCopilotDashboard onOpenActionCenter={() => setActionCenterOpen(true)} />
+      </div>
+
+      {/* Phase 3D-1: AI Crop Health Vision & Selling Agent Core Tools */}
+      <div className="fc-grid-2" style={{ marginBottom: "24px" }}>
+        <Card style={{ padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: "4px solid var(--brand)" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+              <span style={{ fontSize: "22px" }}>🌱</span>
+              <div>
+                <h3 className="fc-h3" style={{ margin: 0 }}>Crop & Plant Health Vision</h3>
+                <span className="fc-soft" style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--brand)" }}>
+                  Gemini Vision Diagnostic
+                </span>
+              </div>
+            </div>
+            <p className="fc-muted" style={{ fontSize: "13px", lineHeight: 1.5, margin: "0 0 16px 0" }}>
+              Snap or upload photos of leaves, stems, or fruits. Detect blights, fungal rusts, pest damage, and nutrient deficiencies with instant organic treatment recommendations.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+            <Button variant="primary" size="sm" onClick={() => navigate("/farmer/crop-health")} style={{ fontWeight: 700 }}>
+              🌿 Scan Crop Photo →
+            </Button>
+            <span className="fc-soft" style={{ fontSize: "12px" }}>AI Multimodal Scanner</span>
+          </div>
+        </Card>
+
+        <Card style={{ padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: "4px solid var(--accent)" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+              <span style={{ fontSize: "22px" }}>🛒</span>
+              <div>
+                <h3 className="fc-h3" style={{ margin: 0 }}>Marketplace Selling Agent</h3>
+                <span className="fc-soft" style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--accent)" }}>
+                  Autonomous Strategy Copilot
+                </span>
+              </div>
+            </div>
+            <p className="fc-muted" style={{ fontSize: "13px", lineHeight: 1.5, margin: "0 0 16px 0" }}>
+              Analyze mandi price trends, generate optimal tier pricing, identify high-volume wholesale buyers, and auto-compose persuasive negotiation messages.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+            <Button variant="accent" size="sm" onClick={() => navigate("/farmer/sell-smarter")} style={{ fontWeight: 700 }}>
+              🤖 Launch Selling Agent →
+            </Button>
+            <span className="fc-soft" style={{ fontSize: "12px" }}>Deal & Margin Optimization</span>
+          </div>
+        </Card>
       </div>
 
       {/* 🌱 FarmConnect AI Copilot Insights Card */}
@@ -571,6 +661,11 @@ function FarmerDashboardBase() {
         </Card>
       </div>
 
+      {/* Phase 10 AI Reports & Advanced Analytics Section */}
+      <div style={{ marginBottom: "28px" }}>
+        <AnalyticsDashboard />
+      </div>
+
       {/* Floating / Bottom Quick Actions Bar */}
       <Card style={{ padding: "18px 24px", background: "var(--surface)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
@@ -582,6 +677,12 @@ function FarmerDashboardBase() {
             <Button variant="primary" size="sm" onClick={() => navigate("/farmer/products/add")}>
               + Add New Crop Listing
             </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/farmer/crop-health")}>
+              🌱 Crop Health
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/farmer/sell-smarter")}>
+              🛒 Selling Agent
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/farmer/products")}>
               📦 Manage Inventory ({myProducts.length})
             </Button>
@@ -591,6 +692,10 @@ function FarmerDashboardBase() {
           </div>
         </div>
       </Card>
+
+      <Modal open={actionCenterOpen} onClose={() => setActionCenterOpen(false)} title="Copilot Action Center" width="750px">
+        <AiActionCenter onClose={() => setActionCenterOpen(false)} />
+      </Modal>
 
       <OnboardingModal open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
     </div>

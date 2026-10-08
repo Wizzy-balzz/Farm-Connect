@@ -10,7 +10,7 @@ import { Badge } from "../../components/common/Badge.jsx";
 import { Avatar } from "../../components/common/Avatar.jsx";
 import { SearchBox } from "../../components/common/SearchBar.jsx";
 import { Modal } from "../../components/common/Modal.jsx";
-import { Sprout, Check, Search, ArrowLeft } from "../../components/icons/Icons.jsx";
+import { Sprout, ArrowLeft } from "../../components/icons/Icons.jsx";
 
 function ChatPageBase() {
   const { user } = useAuth();
@@ -19,14 +19,13 @@ function ChatPageBase() {
   const { conversationId: urlConvId } = useParams();
 
   const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeConvId, setActiveConvId] = useState(urlConvId || null);
   const [activeConv, setActiveConv] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [suggestingAi, setSuggestingAi] = useState(false);
 
   // Modals & Menu states
@@ -105,17 +104,24 @@ function ChatPageBase() {
 
     const unsubscribe = subscribeRealtimeEvents(({ event, data }) => {
       if (event === "chat:message") {
-        if (data.conversationId === activeConvId) {
-          setMessages((prev) => [...prev, data.message]);
-          apiFetch(`/api/conversations/${activeConvId}/read`, { method: "PUT" }).catch(() => {});
+        if (data && data.message) {
+          if (data.conversationId === activeConvId) {
+            setMessages((prev) => {
+              const alreadyExists = prev.some((m) => m.id === data.message.id);
+              if (alreadyExists) return prev;
+              return [...prev, data.message];
+            });
+            apiFetch(`/api/conversations/${activeConvId}/read`, { method: "PUT" }).catch(() => {});
+          }
+          fetchConversations();
         }
-        fetchConversations();
       } else if (event === "chat:read") {
-        if (data.conversationId === activeConvId) {
+        if (data && data.conversationId === activeConvId) {
           setMessages((prev) =>
             prev.map((m) => ({ ...m, isRead: 1, status: "read" }))
           );
         }
+        fetchConversations();
       }
     });
 
@@ -139,7 +145,11 @@ function ChatPageBase() {
       });
 
       if (data && data.message) {
-        setMessages((prev) => [...prev, data.message]);
+        setMessages((prev) => {
+          const alreadyExists = prev.some((m) => m.id === data.message.id);
+          if (alreadyExists) return prev;
+          return [...prev, data.message];
+        });
         if (!customText) setInputText("");
         fetchConversations();
       }
@@ -274,7 +284,11 @@ function ChatPageBase() {
 
           {/* Conversations List */}
           <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
-            {filteredConversations.length === 0 ? (
+            {loading ? (
+              <div style={{ padding: "24px", textAlign: "center" }} className="fc-muted">
+                <p style={{ fontSize: "13px", margin: 0 }}>Loading conversations...</p>
+              </div>
+            ) : filteredConversations.length === 0 ? (
               <div style={{ padding: "24px", textAlign: "center" }} className="fc-muted">
                 <p style={{ fontSize: "13px", margin: 0 }}>No conversations found.</p>
               </div>

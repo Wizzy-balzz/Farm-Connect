@@ -22,6 +22,7 @@ import { CATEGORIES, REGIONS } from "../../utils/constants.js";
 import { useData } from "../../hooks/useData.js";
 import { useCart } from "../../hooks/useCart.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
+import { getCategoryLabel, getUnitLabel, getGradeLabel, getSystemTerm } from "../../utils/controlledVocabulary.js";
 import { useDebounce } from "../../hooks/useDebounce.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
 import { useAuth } from "../../hooks/useAuth.js";
@@ -36,7 +37,7 @@ const CATEGORY_FALLBACKS = {
 };
 
 function MarketplaceBase() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user: currentUser } = useAuth();
   const { products } = useData();
   const { wishlist, addToCart, toggleWishlist } = useCart();
@@ -277,10 +278,11 @@ function MarketplaceBase() {
         if (!term) return true;
         const farmer = getFarmer(p.farmerId);
         const pName = p?.name?.toLowerCase() || "";
+        const origName = p?.originalName?.toLowerCase() || "";
         const fName = farmer?.name?.toLowerCase() || "";
         const fFarm = farmer?.farmName?.toLowerCase() || "";
         const cCity = (p?.city || farmer?.city || "").toLowerCase();
-        return pName.includes(term) || fName.includes(term) || fFarm.includes(term) || cCity.includes(term);
+        return pName.includes(term) || origName.includes(term) || fName.includes(term) || fFarm.includes(term) || cCity.includes(term);
       });
 
     if (sortBy === "price_asc") {
@@ -404,9 +406,9 @@ function MarketplaceBase() {
   const categoryTabs = useMemo(() => {
     return ["All", ...CATEGORIES].map((c) => ({
       id: c,
-      label: c === "All" ? t("all") : c,
+      label: getCategoryLabel(c, lang),
     }));
-  }, [t]);
+  }, [lang]);
 
   return (
     <div className="fc-page-transition">
@@ -665,7 +667,7 @@ function MarketplaceBase() {
                   onChange={() => setCategory(c)}
                   style={{ marginRight: 6 }}
                 />
-                {c === "All" ? t("all") : c}
+                {getCategoryLabel(c, lang)}
               </label>
             ))}
           </div>
@@ -736,20 +738,21 @@ function MarketplaceBase() {
               <MapBoxView
                 markers={filtered.map((p) => {
                   const farmer = getFarmer(p.farmerId);
+                  const locParts = [p.city || farmer.city, p.district || farmer.district, p.region || farmer.region].filter(Boolean);
                   return {
                     id: p.id,
                     title: p.name,
                     farmerName: farmer.name,
-                    location: `${p.city || farmer.city || "Kovilpatti"}, ${p.region || farmer.region || "Tamil Nadu"}`,
-                    city: p.city || farmer.city || "Kovilpatti",
-                    district: p.district || farmer.district || "Thoothukudi",
-                    region: p.region || farmer.region || "Tamil Nadu",
+                    location: locParts.join(", "),
+                    city: p.city || farmer.city,
+                    district: p.district || farmer.district,
+                    region: p.region || farmer.region,
                     countryCode: p.countryCode || farmer.countryCode || "IN",
                     price: p.price,
                     currency: p.currency || farmer.currency || "INR",
                     unit: p.unit,
-                    lat: p.lat || farmer.lat || 9.1724,
-                    lng: p.lng || farmer.lng || 77.8687
+                    lat: p.lat ?? farmer.lat,
+                    lng: p.lng ?? farmer.lng
                   };
                 })}
                 height="520px"
@@ -882,15 +885,15 @@ function MarketplaceBase() {
 
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <div>
-                      <strong>{formatCurrency(p.price)}</strong>/{p.unit}
+                      <strong>{formatCurrency(p.price)}</strong>/{p.translatedUnit || getUnitLabel(p.unit, lang)}
                       {isCheapest && (
                         <Badge variant="success" style={{ marginLeft: 6, fontSize: 9 }}>
                           CHEAPEST
                         </Badge>
                       )}
                     </div>
-                    <div>Grade {p.grade}</div>
-                    <div>{p.moq} {p.unit}</div>
+                    <div>{p.translatedGrade || getGradeLabel(p.grade, lang)}</div>
+                    <div>{p.moq} {p.translatedUnit || getUnitLabel(p.unit, lang)}</div>
                     <div>{p.organic === 1 ? "🌿 Yes" : "—"}</div>
                     <div>★ {farmer.rating?.toFixed(1) || "4.6"}</div>
                   </div>
@@ -923,7 +926,7 @@ function MarketplaceBase() {
                   <Badge variant="organic" />
                 )}
                 <Badge variant="neutral" style={{ background: "var(--surface)", color: "var(--text)", fontWeight: 700 }}>
-                  Grade {viewProduct.grade}
+                  {viewProduct.translatedGrade || getGradeLabel(viewProduct.grade, lang)}
                 </Badge>
               </div>
             </div>
@@ -963,14 +966,14 @@ function MarketplaceBase() {
                 <strong style={{ fontSize: 18, fontFamily: "var(--font-heading)" }}>
                   {formatCurrency(viewProduct.price)}
                 </strong>{" "}
-                <span className="fc-soft">/{viewProduct.unit}</span>
+                <span className="fc-soft">/{viewProduct.translatedUnit || getUnitLabel(viewProduct.unit, lang)}</span>
               </div>
               <div>
                 <span className="fc-soft" style={{ fontSize: 11, display: "block", fontWeight: 700 }}>
                   MINIMUM ORDER QUANTITY (MOQ)
                 </span>
                 <strong>
-                  {viewProduct.moq || 10} {viewProduct.unit}
+                  {viewProduct.moq || 10} {viewProduct.translatedUnit || getUnitLabel(viewProduct.unit, lang)}
                 </strong>
               </div>
             </div>

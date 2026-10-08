@@ -1,6 +1,17 @@
 import crypto from "crypto";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
-const JWT_SECRET = process.env.JWT_SECRET || "farmconnect_super_secret_jwt_key_2026_secure";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, "../.env") });
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error("FATAL ERROR: JWT_SECRET environment variable is not set. Refusing to start without a secure secret.");
+  throw new Error("JWT_SECRET environment variable is not set.");
+}
 const DEFAULT_EXPIRATION_SECONDS = 24 * 60 * 60; // 24 hours
 
 /**
@@ -93,7 +104,7 @@ function base64UrlDecode(str) {
 /**
  * Sign JWT token using HMAC SHA-256
  */
-export function signJwt(payload, secret = JWT_SECRET, expiresInSeconds = DEFAULT_EXPIRATION_SECONDS) {
+export function signJwt(payload, secret = (process.env.JWT_SECRET || JWT_SECRET), expiresInSeconds = DEFAULT_EXPIRATION_SECONDS) {
   const header = { alg: "HS256", typ: "JWT" };
   const now = Math.floor(Date.now() / 1000);
   const fullPayload = {
@@ -120,7 +131,7 @@ export function signJwt(payload, secret = JWT_SECRET, expiresInSeconds = DEFAULT
 /**
  * Verify JWT token signature and expiration
  */
-export function verifyJwt(token, secret = JWT_SECRET) {
+export function verifyJwt(token, secret = (process.env.JWT_SECRET || JWT_SECRET)) {
   if (!token || typeof token !== "string") return null;
 
   const parts = token.split(".");

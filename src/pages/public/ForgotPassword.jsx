@@ -54,10 +54,6 @@ function ForgotPasswordBase() {
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  const togglePasswordVisibility = useCallback(() => {
-    setShowPassword((v) => !v);
-  }, []);
-
   // Step 1: Verify email exists and optionally dispatch OTP
   const handleVerifyEmail = useCallback(
     async (e) => {

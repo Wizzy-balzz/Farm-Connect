@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { StatCard } from "../../components/common/StatCard.jsx";
 import { OnboardingModal } from "../../components/common/OnboardingModal.jsx";
-import { ShoppingBag, Heart, Cart, ClipboardList, TrendingUp, Info } from "../../components/icons/Icons.jsx";
-import { formatCurrency, formatDate } from "../../utils/formatters.js";
+import { ShoppingBag, Heart, Cart, ClipboardList, TrendingUp } from "../../components/icons/Icons.jsx";
+import { formatCurrency } from "../../utils/formatters.js";
 import { useData } from "../../hooks/useData.js";
 import { useCart } from "../../hooks/useCart.js";
 import { useAuth } from "../../hooks/useAuth.js";
@@ -17,19 +17,18 @@ function VendorDashboardBase() {
   const { cart, wishlist } = useCart();
   const navigate = useNavigate();
 
-  const [onboardingOpen, setOnboardingOpen] = useState(false);
-
-  useEffect(() => {
+  const [onboardingOpen, setOnboardingOpen] = useState(() => {
     try {
       const shown = localStorage.getItem("fc_vendor_onboarding_done");
       if (!shown) {
-        setOnboardingOpen(true);
         localStorage.setItem("fc_vendor_onboarding_done", "true");
+        return true;
       }
     } catch {
       /* noop */
     }
-  }, []);
+    return false;
+  });
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -163,9 +162,23 @@ function VendorDashboardBase() {
 
       {/* B2B Procurement Intelligence Advisor */}
       <div className="fc-panel" style={{ marginBottom: "24px" }}>
-        <div className="fc-forecast-header" style={{ marginBottom: 16 }}>
-          <h3 className="fc-h3">📈 Procurement Insights</h3>
-          <p className="fc-muted fc-mt-4">Pricing deals and reorder suggestions based on your purchase history.</p>
+        <div className="fc-forecast-header" style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <h3 className="fc-h3" style={{ margin: 0 }}>📈 Procurement Insights</h3>
+            <p className="fc-muted fc-mt-4" style={{ margin: 0 }}>Pricing deals and reorder suggestions based on your purchase history.</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent("fc-open-ai-chat", {
+                detail: { prompt: "Find available wholesale produce suppliers with highest grade and lowest transit distance." }
+              }));
+            }}
+            style={{ fontSize: "12px", fontWeight: 600 }}
+          >
+            💬 Sourcing Assistant
+          </Button>
         </div>
 
         <div className="fc-grid-2" style={{ gap: "20px" }}>

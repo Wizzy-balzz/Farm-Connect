@@ -79,18 +79,39 @@ router.get("/", requireAuth, async (req, res) => {
 router.post("/", requireAuth, async (req, res) => {
   let { farmerId, vendorId, productId, orderId } = req.body || {};
 
-  // Determine identity safely from user role
-  if (req.user.role === "farmer") {
-    farmerId = req.user.id;
-  } else if (req.user.role === "vendor") {
-    vendorId = req.user.id;
-  }
-
-  if (!farmerId || !vendorId) {
-    return sendError(res, 400, "INVALID_INPUT", "Both farmerId and vendorId are required.");
-  }
-
   try {
+    // If orderId is provided, look up participants from orders and order_items if not explicitly given
+    if (orderId) {
+      if (!vendorId) {
+        const orderRow = await query.get("SELECT vendorId FROM orders WHERE id = ?", [orderId]);
+        if (orderRow) vendorId = orderRow.vendorId;
+      }
+      if (!farmerId) {
+        const itemRow = await query.get("SELECT farmerId FROM order_items WHERE orderId = ? LIMIT 1", [orderId]);
+        if (itemRow) farmerId = itemRow.farmerId;
+      }
+    }
+
+    // If productId is provided, look up farmerId from products if not explicitly given
+    if (productId && !farmerId) {
+      const prodRow = await query.get("SELECT farmerId FROM products WHERE id = ?", [productId]);
+      if (prodRow) farmerId = prodRow.farmerId;
+    }
+
+    // Determine identity safely from user role
+    if (req.user.role === "farmer") {
+      farmerId = req.user.id;
+    } else if (req.user.role === "vendor") {
+      vendorId = req.user.id;
+    }
+
+    if (!farmerId || !vendorId) {
+      return sendError(res, 400, "INVALID_INPUT", "Both farmerId and vendorId are required.");
+    }
+
+    if (farmerId === vendorId) {
+      return sendError(res, 400, "INVALID_INPUT", "Cannot start a conversation with yourself.");
+    }
     // Check if matching conversation already exists
     let existing = null;
     if (productId) {
@@ -309,7 +330,7 @@ router.post("/:id/block", requireAuth, async (req, res) => {
     const blockId = generateId("blk");
 
     await query.run(
-      "INSERT OR IGNORE INTO blocked_users (id, userId, blockedUserId, createdAt) VALUES (?, ?, ?, ?)",
+      "INSERT IGNORE INTO blocked_users (id, userId, blockedUserId, createdAt) VALUES (?, ?, ?, ?)",
       [blockId, userId, targetUserId, new Date().toISOString()]
     );
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Sprout, Bell, Cart, Moon, Sun, Menu, XCircle } from "../icons/Icons.jsx";
+import { Sprout, Bell, Cart, Moon, Sun, Menu } from "../icons/Icons.jsx";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useTheme } from "../../hooks/useTheme.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
@@ -12,6 +12,8 @@ import { formatDate } from "../../utils/formatters.js";
 
 const FARMER_NAV = [
   { path: "/farmer/dashboard", label: "Overview" },
+  { path: "/farmer/crop-health", label: "Crop Health" },
+  { path: "/farmer/sell-smarter", label: "Sell Smarter" },
   { path: "/farmer/products", label: "Harvests" },
   { path: "/farmer/orders", label: "Orders" },
 ];

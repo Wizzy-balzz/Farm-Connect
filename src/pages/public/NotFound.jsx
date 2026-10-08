@@ -51,9 +51,9 @@ function NotFoundBase() {
           <AlertTriangle size={28} />
         </div>
         <h1 className="fc-h1" style={{ fontSize: "32px", marginBottom: "10px" }}>404</h1>
-        <h2 className="fc-h2" style={{ marginBottom: "16px" }}>{t("pageNotFound") || "Page Not Found"}</h2>
+        <h2 className="fc-h2" style={{ marginBottom: "16px" }}>{t("pageNotFound", "Page Not Found")}</h2>
         <p className="fc-muted" style={{ marginBottom: "28px", fontSize: "14px", lineHeight: "1.5" }}>
-          {t("pageNotFoundMsg") || "The page you are looking for does not exist or has been moved."}
+          {t("pageNotFoundMsg", "The page you are looking for does not exist or has been moved.")}
         </p>
         <Button variant="primary" full onClick={handleReturnHome}>
           {role ? (role === "farmer" ? t("dashboard") : t("marketplace")) : t("getStarted")}

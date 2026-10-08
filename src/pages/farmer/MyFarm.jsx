@@ -8,7 +8,6 @@ import {
   Button,
   StatCard,
   Avatar,
-  EmptyState,
 } from "../../components/common/index.js";
 import {
   Check,
@@ -17,13 +16,12 @@ import {
   TrendingUp,
   ClipboardList,
   MapPin,
-  Globe,
 } from "../../components/icons/Icons.jsx";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useData } from "../../hooks/useData.js";
 import { formatDate } from "../../utils/formatters.js";
 import { MapBoxView } from "../../components/common/MapBoxView.jsx";
-import { GlobalLocationSelector } from "../../components/common/GlobalLocationSelector.jsx";
+import { FarmBoundaryMap } from "../../components/farmer/FarmBoundaryMap.jsx";
 
 const DEFAULT_PLOTS = [
   {
@@ -111,7 +109,6 @@ function MyFarmBase() {
   const { farmerProfile, user } = useAuth();
   const { products } = useData();
   const navigate = useNavigate();
-  const [mapMode, setMapMode] = useState("satellite"); // 'satellite' | 'cadastral'
 
   const currentFarmerId = farmerProfile?.id || user?.id;
 
@@ -164,14 +161,24 @@ function MyFarmBase() {
             </p>
           </div>
 
-          <Button
-            variant="accent"
-            size="md"
-            onClick={() => navigate("/farmer/products/add")}
-            style={{ fontWeight: 700, boxShadow: "var(--shadow-sm)" }}
-          >
-            <Plus size={15} /> Add Crop Listing
-          </Button>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => navigate("/farmer/crop-health")}
+              style={{ background: "rgba(255,255,255,0.15)", color: "#ffffff", borderColor: "rgba(255,255,255,0.35)", fontWeight: 600 }}
+            >
+              🌱 Scan Crop Health
+            </Button>
+            <Button
+              variant="accent"
+              size="md"
+              onClick={() => navigate("/farmer/products/add")}
+              style={{ fontWeight: 700, boxShadow: "var(--shadow-sm)" }}
+            >
+              <Plus size={15} /> Add Crop Listing
+            </Button>
+          </div>
         </div>
 
         {/* State Farmer Registry Integration Readiness Banner */}
@@ -253,15 +260,15 @@ function MyFarmBase() {
                 id: "farm-1",
                 title: farmerProfile.farmName || "My Farm",
                 farmerName: farmerProfile.name,
-                city: farmerProfile.city || "Kovilpatti",
-                district: farmerProfile.district || "Thoothukudi",
-                region: farmerProfile.region || "Tamil Nadu",
+                city: farmerProfile.city,
+                district: farmerProfile.district,
+                region: farmerProfile.region,
                 countryCode: farmerProfile.countryCode || "IN",
-                lat: farmerProfile.lat || 9.1724,
-                lng: farmerProfile.lng || 77.8687
+                lat: farmerProfile.lat,
+                lng: farmerProfile.lng
               }
             ]}
-            center={{ lat: farmerProfile.lat || 9.1724, lng: farmerProfile.lng || 77.8687 }}
+            center={{ lat: farmerProfile.lat, lng: farmerProfile.lng }}
             height="320px"
           />
         </CardBody>
@@ -328,6 +335,26 @@ function MyFarmBase() {
           })}
         </div>
       </div>
+
+      {/* Phase 3D-1: AI Crop Health Diagnostics Spotlight */}
+      <Card style={{ padding: "18px 22px", marginBottom: "24px", background: "var(--brand-light)", borderColor: "var(--brand)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: "28px" }}>🌿</span>
+            <div>
+              <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", fontWeight: 700, color: "var(--brand-dark)" }}>
+                AI Crop Health Diagnostics & Leaf Scanner
+              </h4>
+              <p className="fc-muted" style={{ margin: 0, fontSize: "12.5px" }}>
+                Suspect fungal blights, rust, leaf spots, or nutrient deficiencies in your plots? Snap or upload a leaf photo for instant AI diagnosis.
+              </p>
+            </div>
+          </div>
+          <Button variant="primary" size="sm" onClick={() => navigate("/farmer/crop-health")} style={{ fontWeight: 700 }}>
+            Scan Plot Produce →
+          </Button>
+        </div>
+      </Card>
 
       {/* 4. Crop Timeline & Milestone Growth Tracker */}
       <Card style={{ padding: "22px", marginBottom: "28px" }}>
@@ -494,96 +521,11 @@ function MyFarmBase() {
         </Card>
       </div>
 
-      {/* 7. Satellite Survey / Cadastral Map Placeholder Architecture */}
-      <Card style={{ padding: "22px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: "16px" }}>
-          <div>
-            <h3 className="fc-h3" style={{ margin: 0 }}>
-              🗺️ Farm Boundary & GIS Satellite Survey
-            </h3>
-            <p className="fc-muted" style={{ fontSize: "13.0px", margin: "4px 0 0 0" }}>
-              Cadastral land boundaries and satellite survey readiness architecture.
-            </p>
-          </div>
-          <div className="fc-flex-gap-8">
-            <Button
-              variant={mapMode === "satellite" ? "primary" : "outline"}
-              size="sm"
-              onClick={() => setMapMode("satellite")}
-            >
-              Satellite View
-            </Button>
-            <Button
-              variant={mapMode === "cadastral" ? "primary" : "outline"}
-              size="sm"
-              onClick={() => setMapMode("cadastral")}
-            >
-              Cadastral Survey
-            </Button>
-          </div>
-        </div>
-
-        {/* Map Container Placeholder */}
-        <div
-          style={{
-            height: "260px",
-            borderRadius: "var(--radius-md)",
-            background:
-              mapMode === "satellite"
-                ? "linear-gradient(135deg, #1e3a1e 0%, #0d1e0d 100%)"
-                : "linear-gradient(135deg, #2b3a4a 0%, #15222e 100%)",
-            color: "#ffffff",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            overflow: "hidden",
-            boxShadow: "inset 0 0 20px rgba(0,0,0,0.5)",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: 0.15,
-              backgroundImage:
-                "radial-gradient(#ffffff 1px, transparent 1px), radial-gradient(#ffffff 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
-            }}
-          />
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              textAlign: "center",
-              padding: "20px",
-              maxWidth: "500px",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "36px",
-                marginBottom: "8px",
-              }}
-            >
-              {mapMode === "satellite" ? "🛰️" : "🗺️"}
-            </div>
-            <h4 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 6px 0", fontFamily: "var(--font-heading)" }}>
-              {mapMode === "satellite"
-                ? "Satellite Boundary Survey View"
-                : "Cadastral Land Survey View"}
-            </h4>
-            <p style={{ fontSize: "12px", opacity: 0.85, margin: "0 0 14px 0", lineHeight: 1.45 }}>
-              Coordinates: <strong>19.9975° N, 73.7898° E</strong> • Elevation: 600m ASL • Land Survey Parcel #402/1A
-            </p>
-            <Badge variant="success" style={{ fontSize: "10.5px", background: "rgba(255,255,255,0.2)", color: "#fff" }}>
-              GIS MAP ARCHITECTURE READY FOR STATE LAND INTEGRATION
-            </Badge>
-          </div>
-        </div>
-      </Card>
+      {/* 7. Interactive Farm Boundary & GIS Demarcation */}
+      <FarmBoundaryMap
+        farmerCoordinates={{ lat: farmerProfile?.lat, lng: farmerProfile?.lng }}
+        farmName={farmerProfile?.farmName || "My Farm"}
+      />
     </div>
   );
 }

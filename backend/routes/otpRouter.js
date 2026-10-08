@@ -25,7 +25,13 @@ router.post("/request", async (req, res) => {
     return sendError(res, 400, "INVALID_INPUT", "Contact and purpose are required to send OTP.");
   }
 
-  const validPurposes = ["password_change", "password_reset", "order_confirmation", "sensitive_action"];
+  const validPurposes = [
+    "password_change",
+    "password_reset",
+    "order_confirmation",
+    "sensitive_action",
+    "registration_verification"
+  ];
   if (!validPurposes.includes(purpose)) {
     return sendError(res, 400, "INVALID_PURPOSE", `Invalid OTP purpose. Must be one of: ${validPurposes.join(", ")}`);
   }
@@ -38,8 +44,23 @@ router.post("/request", async (req, res) => {
     });
     res.json(result);
   } catch (err) {
-    console.error("OTP request error:", err.message);
-    sendError(res, 400, "OTP_REQUEST_FAILED", err.message || "Failed to generate OTP.");
+    const sanitizedMsg = (err.message || String(err)).replace(
+      process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || "____",
+      "[REDACTED]"
+    );
+    console.error("OTP request error:", sanitizedMsg);
+    if (err.message && err.message.includes("Too many OTP requests")) {
+      return sendError(res, 429, "RATE_LIMIT_EXCEEDED", "Too many OTP requests. Please wait a few minutes before requesting again.");
+    }
+    const userMessage =
+      err.friendlyMessage ||
+      "We couldn't send your verification code right now. Please try again in a moment, or contact support if this continues.";
+    sendError(
+      res,
+      400,
+      err.code || "OTP_REQUEST_FAILED",
+      userMessage
+    );
   }
 });
 

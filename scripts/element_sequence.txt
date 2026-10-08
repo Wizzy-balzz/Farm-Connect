@@ -1,0 +1,561 @@
+[0] P (None): STORE MANAGEMENT SYSTEM
+[1] P (None): 23CS54C – MODERN WEB TECHNOLOGIES
+[2] P (None): Submitted by
+[3] P (None): HARIRAAM B 24104085
+[4] P (None): In partial fulfillment for the award of the degree
+[5] P (None): of
+[6] P (None): BACHELOR OF ENGINEERING/TECHNOLOGY
+[7] P (None): in
+[8] P (None): COMPUTER SCIENCE AND ENGINEERING/ INFORMATION TECHNOLOGY
+[9] P (None):  [DRAWINGS: 1]
+[10] P (None): NATIONAL ENGINEERING COLLEGE
+[11] P (None): (An Autonomous Institution affiliated to Anna University, Chennai)
+[12] P (None): K.R.NAGAR, KOVILPATTI - 628503
+[13] P (None): OCTOBER - 2026
+[14] P (None): NATIONAL ENGINEERING COLLEGE
+[15] P (None): (An Autonomous Institution affiliated to Anna University, Chennai)
+[16] P (None): K.R.NAGAR, KOVILPATTI - 628503
+[17] P (None):  [DRAWINGS: 1]
+[18] P (None): BONAFIDE CERTIFICATE
+[19] P (None): This is to certify that this project report, “Store Management System”, is the bonafide work of B HA
+[20] P (None): Course Instructor/Guide
+[21] P (None): Submitted to the 23CS54C – MODERN WEB TECHNOLOGIES Viva-Voce examination held at National Engineerin
+[22] P (None): Internal Examiner	Co Examiner
+[23] P (None): TABLE OF CONTENTS
+[24] P (None): CH NO	TITLE	PAGE NO
+[25] P (None): 1	INTRODUCTION	3
+[26] P (None): 2	OBJECTIVES	4
+[27] P (None): 3	DESCRIPTION	5
+[28] P (None): 4	CLASS DIAGRAM	6
+[29] P (None): 5	TABLE STRUCTURES	7
+[30] P (None): 6	ER DIAGRAM	16
+[31] P (None): 7	TECH STACK	18
+[32] P (None): 8	MODULES	19
+[33] P (None): 9	CONCLUSION	70
+[34] P (None): CHAPTER 1
+[35] P (Heading 1): INTRODUCTION
+[36] P (None): In the modern business environment, the efficient management of store operations plays a vital role 
+[37] P (None): The Store Management System is a comprehensive, full-stack web application designed to digitize and 
+[38] P (None): The application is organized into three major functional domains: Master Data Management, which cove
+[39] P (None): The system is hosted at https://krexports.org and is supported by a Jenkins-based CI/CD pipeline for
+[40] P (None): CHAPTER 2
+[41] P (Heading 1): OBJECTIVES
+[42] P (List Paragraph): To Digitize Store Operations: Replace manual record-keeping with a digital system to improve accurac
+[43] P (List Paragraph): To Centralize Master Data: Maintain consistent and accurate master data for items, departments, supp
+[44] P (List Paragraph): To Automate the Procurement Lifecycle: Streamline procurement from purchase orders to bill verificat
+[45] P (List Paragraph): To Track Material Movement: Monitor and record all inward and outward movement of goods for effectiv
+[46] P (List Paragraph): To Manage Item Issuance to Departments: Record item issuance to departments to ensure accountability
+[47] P (List Paragraph): To Enforce User Authentication and Role-Based Access: Secure the application using JWT authenticatio
+[48] P (List Paragraph): To Provide Dynamic Reporting and Analytics: Generate detailed reports and export them to Excel for e
+[49] P (List Paragraph): To Ensure System Security and Reliability: Implement security measures such as Helmet, CORS, rate li
+[50] P (List Paragraph): To Deploy a Scalable, Maintainable Architecture: Use a modular REST API architecture with separate f
+[51] P (List Paragraph): To Enable Continuous Deployment via CI/CD: Automate application builds and deployments using Jenkins
+[52] P (None): CHAPTER 3
+[53] P (Heading 1): DESCRIPTION
+[54] P (None): The Store Management System is a full-stack web application developed to manage and automate store a
+[55] P (None): 1. Master Data Management
+[56] P (None): This module maintains centralized master records, including departments, suppliers, stores, items, p
+[57] P (None): 2. Transaction Management
+[58] P (None): This module manages day-to-day store activities, including Purchase Orders, Gate Inward, Material Re
+[59] P (None): 3. Reports and Dashboard
+[60] P (None): The Reports module generates dynamic reports for purchase orders, receipts, item issues, bills, and 
+[61] P (None): 4. Security and Access Control
+[62] P (None): The system uses bcrypt for password hashing and JSON Web Token (JWT) authentication to secure user a
+[63] P (None): 5. Technology and Deployment
+[64] P (None): The application uses React for the frontend, Node.js for the backend, and MySQL with Sequelize for d
+[65] P (None): CHAPTER 4
+[66] P (Heading 1): CLASS DIAGRAM
+[67] P (None):  [DRAWINGS: 1]
+[68] P (None): CHAPTER 5
+[69] P (Heading 1): TABLE STRUCTURES
+[70] P (None): Users
+[71] P (None):  [DRAWINGS: 1]
+[72] P (None): Supplier Details
+[73] P (None):  [DRAWINGS: 1]
+[74] P (None): Uoms :
+[75] P (None):  [DRAWINGS: 1]
+[76] P (None): States :
+[77] P (None):  [DRAWINGS: 1]
+[78] P (None): Sub_Heads :
+[79] P (None):  [DRAWINGS: 1]
+[80] P (None): Store Master :
+[81] P (None):  [DRAWINGS: 1]
+[82] P (None): ProductHead :
+[83] P (None):  [DRAWINGS: 1]
+[84] P (None): Department :
+[85] P (None):  [DRAWINGS: 1]
+[86] P (None): Purchase_Type :
+[87] P (None):  [DRAWINGS: 1]
+[88] P (None): ItemMaster :
+[89] P (None):  [DRAWINGS: 1]
+[90] P (None): Party_master :
+[91] P (None):  [DRAWINGS: 1]
+[92] P (None): Purchase_orders :
+[93] P (None):  [DRAWINGS: 1]
+[94] P (None): Purchase_order_details :
+[95] P (None):  [DRAWINGS: 1]
+[96] P (None): Item :
+[97] P (None):  [DRAWINGS: 1]
+[98] P (None): Gate_inward :
+[99] P (None):  [DRAWINGS: 1]
+[100] P (None): Gate_inward_details :
+[101] P (None):  [DRAWINGS: 1]
+[102] P (None): Receipts
+[103] P (None):  [DRAWINGS: 1]
+[104] P (None): Receipt_details :
+[105] P (None):  [DRAWINGS: 1]
+[106] P (None): Bill_entry_details :
+[107] P (None):  [DRAWINGS: 1]
+[108] P (None): Item_issue :
+[109] P (None):  [DRAWINGS: 1]
+[110] P (None): Item_issue_detail :
+[111] P (None):  [DRAWINGS: 1]
+[112] P (None): Bill_entries :
+[113] P (None):  [DRAWINGS: 1]
+[114] P (None): Cancel_orders :
+[115] P (None):  [DRAWINGS: 1]
+[116] P (None): CHAPTER 6
+[117] P (Heading 1): ER DIAGRAM
+[118] P (None): ADDITIONAL MASTER TABLES
+[119] P (None):  [DRAWINGS: 1]
+[120] P (None):  [DRAWINGS: 1]
+[121] P (None): CHAPTER 7
+[122] P (Heading 1): TECH STACK
+[123] P (Heading 2): 7.1 TECH STACK
+[124] TABLE (11x3): ['Layer', 'Technology', 'Purpose']
+[125] P (Heading 2): 7.2 ARCHITECTURE OVERVIEW
+[126] TABLE (4x3): ['Layer', 'Technology', 'Purpose']
+[127] P (None): CHAPTER 8
+[128] P (Heading 1): MODULES
+[129] P (Heading 2): 8.0 Design Approach
+[130] P (None): Each module of the Store Management System is described here the way a system design problem is solv
+[131] TABLE (8x3): ['Step', 'Question it answers', 'Presented in each module as']
+[132] P (Heading 3): Shared baseline for all modules
+[133] P (None): Non-functional baseline. Every request travels through Helmet (HTTP hardening), CORS, a payload size
+[134] P (None): Sizing baseline (assumptions).
+[135] TABLE (8x3): ['Quantity', 'Estimate', 'Basis']
+[136] P (None): A single Node.js process and one MySQL instance handle this load comfortably. The design keeps the a
+[137] P (None):  [DRAWINGS: 1]
+[138] P (None): Fig 8.0 Overall request flow of the Store Management System
+[139] P (Heading 2): 8.1 FOLDER STRUCTURE
+[140] P (None):  [DRAWINGS: 1]
+[141] P (None): Fig 8.1.1 Highlevel view of project
+[142] P (None): 8.1.1 BACKEND FOLDER
+[143] P (None):  [DRAWINGS: 1]
+[144] P (None): Fig 8.1.2 – Backend Folder Structure – Overall organization of backend files and directories showing
+[145] P (None):  [DRAWINGS: 1]
+[146] P (None): Fig 8.1.3 config Folder structure
+[147] P (None):  [DRAWINGS: 1]
+[148] P (None): Fig 8.1.4 Controller Folder
+[149] P (None):  [DRAWINGS: 1]
+[150] P (None): 8.1.2 FRONTEND FOLDER
+[151] P (None):  [DRAWINGS: 1]
+[152] P (None): FIG 8.1.7 Structure of Frontend Folder
+[153] P (None):  [DRAWINGS: 1]
+[154] P (None): Fig 8.1.8 Structure of frontend/src
+[155] P (None):  [DRAWINGS: 1]
+[156] P (None):  [DRAWINGS: 1]
+[157] P (None): Fig 8.1.9 Structure of frontend/src/pages Folder
+[158] P (None):  [DRAWINGS: 1]
+[159] P (None): Fig 8.1.10 Structure of frontend/src/routes and frontend/src/services
+[160] P (None):  [DRAWINGS: 1]
+[161] P (None): Fig 8.1.11 Structure of frontend/src/components
+[162] P (Heading 2): 8.2 USER AUTHENTICATION & ACCESS CONTROL
+[163] P (Heading 3): 8.2.0 Purpose & Scope
+[164] P (None): Provides tokenized authentication, secure credential management, and Role-Based Access Control (RBAC
+[165] P (Heading 3): 8.2.1 Functional Requirements
+[166] P (None): What the module must do:
+[167] P (List Paragraph): A user signs in with a username and password and receives a signed JWT plus a profile (id, full_name
+[168] P (List Paragraph): A signed-in user can change their own password; administrators can register new users.
+[169] P (List Paragraph): Four roles – admin, manager, operator, viewer – decide which endpoints a user may call.
+[170] P (List Paragraph): Each account has an active / inactive status so access can be withdrawn without deleting the record,
+[171] P (List Paragraph): The browser redirects unauthenticated users to the login screen (protected routes) and handles an ex
+[172] P (None): Out of scope: self-service sign-up, social login / SSO and multi-factor authentication.
+[173] P (Heading 3): 8.2.2 Non-Functional Requirements
+[174] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[175] P (List Paragraph): Security: passwords are stored only as bcryptjs hashes with auto-generated salts; the hash is never 
+[176] P (List Paragraph): Brute-force defence: at most 15 login attempts per 15 minutes per IP address on /api/auth/login.
+[177] P (List Paragraph): Session length: tokens expire after 12 hours, which limits the damage of a stolen token while avoidi
+[178] P (List Paragraph): Scalability: because tokens are stateless, any server instance can validate a request without a shar
+[179] P (List Paragraph): Latency target: login under 500 ms (dominated by the deliberate cost of bcrypt); token verification 
+[180] P (List Paragraph): CAP: the user table is a single MySQL source of truth – consistency is preferred, so a disabled acco
+[181] P (Heading 3): 8.2.3 Tech Stack
+[182] TABLE (6x3): ['Concern', 'Choice', 'Why it fits this module']
+[183] P (Heading 3): 8.2.4 Back-of-the-Envelope Estimation
+[184] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[185] TABLE (7x3): ['Quantity', 'Estimate', 'Basis']
+[186] P (Heading 3): 8.2.5 Low-Level Architecture
+[187] P (None):  [DRAWINGS: 1]
+[188] P (None): Fig 8.2.A Low-level architecture – USER AUTHENTICATION & ACCESS CONTROL
+[189] P (None): Request flow:
+[190] P (List Paragraph): Login.jsx posts the credentials; rateLimiter.js counts the attempt for the caller’s IP.
+[191] P (List Paragraph): authController looks the user up by username (unique index), checks that the status is active, and c
+[192] P (List Paragraph): On success it updates last_login, signs a JWT (12 h) and returns the token with the profile.
+[193] P (List Paragraph): The client stores the token; api.js adds it as a Bearer header on every later request.
+[194] P (List Paragraph): auth.js verifies the signature and expiry and checks the role before the route handler runs.
+[195] P (List Paragraph): A 401 response triggers the Axios interceptor, which clears the session and sends the user back to t
+[196] P (Heading 3): 8.2.6 API Design
+[197] P (None): Only /api/auth/login is public. The remaining paths are representative routes derived from the authC
+[198] TABLE (5x3): ['Method', 'Endpoint', 'Purpose / contract']
+[199] P (Heading 3): 8.2.7 DB Design
+[200] TABLE (2x3): ['Table', 'Keys & indexes', 'Key columns']
+[201] P (List Paragraph): The unique index on username makes the login look-up a single index read and prevents duplicate acco
+[202] P (List Paragraph): No other table has a foreign key to Users, so authentication can be changed independently of the sto
+[203] P (Heading 3): 8.2.8 Screenshots
+[204] P (None):  [DRAWINGS: 1]
+[205] P (None): Fig 8.2: User Login & Authentication Interface
+[206] P (Heading 2): 8.3 MASTER DATA MANAGEMENT
+[207] P (Heading 3): 8.3.0 Purpose & Scope
+[208] P (None): Unifies foundational reference datasets and enterprise catalogs that establish the baseline for all 
+[209] P (Heading 3): 8.3.1 Functional Requirements
+[210] P (None): What the module must do:
+[211] P (List Paragraph): Create, view, edit and delete records for: Item, Supplier, Department, Store Master, Product Head, S
+[212] P (List Paragraph): Central item catalog: item code, name, department, sub head, UOM, unit rate, opening stock, min / ma
+[213] P (List Paragraph): Supplier registry: account name, place, address, delivery address, GSTIN, PAN, contact details and o
+[214] P (List Paragraph): Search and filter large lists: suppliers by department, place and GST status; items by department, s
+[215] P (List Paragraph): Bulk upload of items from a CSV file.
+[216] P (List Paragraph): Purchase Type records carry accounting formulas (assessable value, round off, lorry freight) and SGS
+[217] P (List Paragraph): Provide searchable reference dropdowns to every transaction screen so users pick, rather than type, 
+[218] P (Heading 3): 8.3.2 Non-Functional Requirements
+[219] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[220] P (List Paragraph): Read-heavy: masters are read many times more often than they are changed (roughly 100 reads per writ
+[221] P (List Paragraph): Scale of lists: with 5,490 suppliers and 11,011 items, lists are paginated on the server (10 per pag
+[222] P (List Paragraph): Data quality: unique keys on department name, state name, store name and purchase type prevent dupli
+[223] P (List Paragraph): Access control: write endpoints are restricted by role (for example, the viewer role is read-only).
+[224] P (List Paragraph): CAP: consistency first – a new supplier or item must be visible to every user as soon as it is saved
+[225] P (Heading 3): 8.3.3 Tech Stack
+[226] TABLE (5x3): ['Concern', 'Choice', 'Why it fits this module']
+[227] P (Heading 3): 8.3.4 Back-of-the-Envelope Estimation
+[228] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[229] TABLE (7x3): ['Quantity', 'Estimate', 'Basis']
+[230] P (Heading 3): 8.3.5 Low-Level Architecture
+[231] P (None):  [DRAWINGS: 1]
+[232] P (None): Fig 8.3.A Low-level architecture – MASTER DATA MANAGEMENT
+[233] P (None): Request flow:
+[234] P (List Paragraph): A master page (for example Item.jsx) sends a GET with search text, filter values, sort and page size
+[235] P (List Paragraph): The matching controller turns them into a Sequelize where / order / limit clause and returns the pag
+[236] P (List Paragraph): Add / edit forms POST or PUT one record; the controller validates required fields and unique keys be
+[237] P (List Paragraph): Transaction screens reuse the same endpoints through SearchSelect, so every dropdown shows current m
+[238] P (Heading 3): 8.3.6 API Design
+[239] P (None): {master} stands for one of: departments, suppliers, items, item-masters, party-masters, store-master
+[240] TABLE (8x3): ['Method', 'Endpoint', 'Purpose / contract']
+[241] P (Heading 3): 8.3.7 DB Design
+[242] TABLE (12x3): ['Table', 'Keys & indexes', 'Key columns']
+[243] P (List Paragraph): Recommended extra index (not yet in the schema): an index on Item(DepartmentId, SubHeadCode) and on 
+[244] P (Heading 3): 8.3.8 Screenshots
+[245] P (None):  [DRAWINGS: 1]
+[246] P (None): fig 8.3.1 Department master list
+[247] P (None): The screen lists departments and provides controls to add, edit, or delete department records. The d
+[248] P (None):  [DRAWINGS: 1]
+[249] P (None): fig 8.3.2 Editing a department
+[250] P (None): An existing department name can be changed in the list and saved or cancelled using the adjacent con
+[251] P (None):  [DRAWINGS: 1]
+[252] P (None): fig 8.3.3 Adding a department
+[253] P (None): The user enters a department name and selects Add Department to create a new record. The screenshot 
+[254] P (None):  [DRAWINGS: 1]
+[255] P (None): fig 8.3.4 Supplier master list
+[256] P (None): The supplier registry displays vendor records with search, filtering, and edit or delete controls. T
+[257] P (None):  [DRAWINGS: 1]
+[258] P (None): fig 8.3.5 Filtering suppliers by place
+[259] P (None): The place dropdown narrows the supplier list to vendors associated with a selected location. The ope
+[260] P (None):  [DRAWINGS: 1]
+[261] P (None): fig 8.3.6 New supplier entry
+[262] P (None): The supplier form captures identification, contact, address, and opening balance information for a n
+[263] P (None):  [DRAWINGS: 1]
+[264] P (None): fig 8.3.7 Item master list
+[265] P (None): The item catalog displays stock items with their classifications, units, rates, and stock levels, al
+[266] P (None):  [DRAWINGS: 1]
+[267] P (None): fig 8.3.8 Filtering items by sub head
+[268] P (None): The sub head dropdown filters the item catalog by the selected product classification. The open sub 
+[269] P (None):  [DRAWINGS: 1]
+[270] P (None): fig 8.3.9 Filtering items by department
+[271] P (None): The department dropdown limits the displayed items to those associated with the selected department.
+[272] P (None):  [DRAWINGS: 1]
+[273] P (None): fig 8.3.10 New item entry
+[274] P (None): The item form records department, classification, item name, unit, stock, and pricing details before
+[275] P (None):  [DRAWINGS: 1]
+[276] P (None): fig 8.3.11 Purchase type master list
+[277] P (None): Purchase types are listed with their codes and ledger mappings, with controls to add or modify entri
+[278] P (None):  [DRAWINGS: 1]
+[279] P (None): fig 8.3.12 Adding a purchase type
+[280] P (None): The form captures a purchase type and its related accounting and tax ledger information. The entry d
+[281] P (None):  [DRAWINGS: 1]
+[282] P (None): fig 8.3.13 Unit of measurement master list
+[283] P (None): The screen maintains measurement units used for item quantities and provides edit and delete control
+[284] P (None):  [DRAWINGS: 1]
+[285] P (None): fig 8.3.14 Adding a unit of measurement
+[286] P (None): The user enters a unit name and selects Save UOM to make it available for item records. The screensh
+[287] P (None):  [DRAWINGS: 1]
+[288] P (None): fig 8.3.15 State master list
+[289] P (None): The state registry supports searching and maintaining state names used in supplier and transaction r
+[290] P (Heading 2): 8.4 PURCHASE ORDER (PO) MANAGEMENT
+[291] P (Heading 3): 8.4.0 Purpose & Scope
+[292] P (None): Orchestrates the procurement lifecycle, from raising purchase orders with approved vendors to multi-
+[293] P (Heading 3): 8.4.1 Functional Requirements
+[294] P (None): What the module must do:
+[295] P (List Paragraph): Raise a PO for a supplier: order date, party, address / place, reference number and remarks; the PO 
+[296] P (List Paragraph): Multi-item line engine: each line takes item, quantity, unit rate, discount %, GST type (SGST + CGST
+[297] P (List Paragraph): Order summary: items subtotal, total discount, total tax, P&F, lorry freight, round off and grand to
+[298] P (List Paragraph): Lifecycle tracking: Draft → Pending / Approval → Approved → Inward Created → Completed / Cancelled.
+[299] P (List Paragraph): Register: search by order number, party or reference; filter by party and status; sort; expand a row
+[300] P (List Paragraph): Controlled cancellation: a PO is cancelled only with a mandatory reason, and not once its items have
+[301] P (Heading 3): 8.4.2 Non-Functional Requirements
+[302] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[303] P (List Paragraph): Accuracy: amounts are DECIMAL(15,2) and unit rates DECIMAL(15,6), so a PO total always matches the s
+[304] P (List Paragraph): Atomicity: the header and all its lines are saved together in one transaction; a PO never exists hal
+[305] P (List Paragraph): Unique numbering: the PO number is allocated on the server and the primary key is the final guard ag
+[306] P (List Paragraph): Server-side validation: totals sent by the browser are recomputed on the server before saving.
+[307] P (List Paragraph): Auditability: every cancellation stores a reason and date; all tables carry createdAt / updatedAt.
+[308] P (List Paragraph): Responsiveness: the register opens in under 1 second; line details load only when a row is expanded.
+[309] P (List Paragraph): CAP: consistency first – the status of a PO must be identical for the store, accounts and management
+[310] P (Heading 3): 8.4.3 Tech Stack
+[311] TABLE (6x3): ['Concern', 'Choice', 'Why it fits this module']
+[312] P (Heading 3): 8.4.4 Back-of-the-Envelope Estimation
+[313] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[314] TABLE (9x3): ['Quantity', 'Estimate', 'Basis']
+[315] P (Heading 3): 8.4.5 Low-Level Architecture
+[316] P (None):  [DRAWINGS: 1]
+[317] P (None): Fig 8.4.A Low-level architecture – PURCHASE ORDER (PO) MANAGEMENT
+[318] P (None): Request flow:
+[319] P (List Paragraph): PurchaseOrder.jsx opens the create modal; the next PO number and the party list are fetched.
+[320] P (List Paragraph): The user picks a party (address and place are filled in) and adds item lines; the page calculates ea
+[321] P (List Paragraph): Save sends the header and all lines in one request; purchaseOrderController recomputes the totals an
+[322] P (List Paragraph): Later stages (gate inward, receipt) read this PO by OrderNo and move its status forward.
+[323] P (List Paragraph): Cancel: cancelOrderController checks that no gate inward exists for the order, stores the reason in 
+[324] P (Heading 3): 8.4.6 API Design
+[325] P (None): All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are re
+[326] TABLE (9x3): ['Method', 'Endpoint', 'Purpose / contract']
+[327] P (Heading 3): 8.4.7 DB Design
+[328] TABLE (4x3): ['Table', 'Keys & indexes', 'Key columns']
+[329] P (List Paragraph): Relationships: one Supplier has many POs; one PO has many detail lines; a PO may have one cancellati
+[330] P (List Paragraph): Existing indexes on PartyCode and OrderNo serve the party filter and the line look-up. Recommended a
+[331] P (Heading 3): 8.4.8 Screenshots
+[332] P (None):  [DRAWINGS: 1]
+[333] P (None): fig 8.4.1 Purchase order list
+[334] P (None): Purchase orders are displayed with supplier details, status, item count, and total value, together w
+[335] P (None):  [DRAWINGS: 1]
+[336] P (None): fig 8.4.2 Creating a purchase order
+[337] P (None): The order form captures the order date, supplier, and item information before the purchase order is 
+[338] P (None):  [DRAWINGS: 1]
+[339] P (None): fig 8.4.3 Purchase order item calculation
+[340] P (None): The item entry area records quantity, unit rate, discount, tax, and additional charges and shows the
+[341] P (None):  [DRAWINGS: 1]
+[342] P (None): fig 8.4.4 Purchase order financial summary
+[343] P (None): The order summary displays the added items and a breakdown of charges and taxes leading to the grand
+[344] P (None):  [DRAWINGS: 1]
+[345] P (None): fig 8.4.5 Expanded purchase order details
+[346] P (None): Expanding an order reveals its line items, quantities, unit rates, discounts, taxes, and item totals
+[347] P (Heading 2): 8.5 GOODS INWARD & INVENTORY RECEIPT (GRN)
+[348] P (Heading 3): 8.5.0 Purpose & Scope
+[349] P (None): Manages the physical arrival of materials. Combines gate consignment logging with formal Goods Recei
+[350] P (Heading 3): 8.5.1 Functional Requirements
+[351] P (None): What the module must do:
+[352] P (List Paragraph): Gate Inward: log an arrival with an automatic inward number (for example GI-771), inward date, party
+[353] P (List Paragraph): Record received quantity against pending quantity for each PO line; one PO can have several inward b
+[354] P (List Paragraph): Duplicate invoice check: warn when the same supplier invoice is entered twice.
+[355] P (List Paragraph): Receipt (GRN): select party and PO, pick the gate-inward batches covered, add invoice, DC number and
+[356] P (List Paragraph): Receiving goods updates the stock balance of the received items and advances the PO status to Inward
+[357] P (List Paragraph): Registers with search, party filter and sort; expand a GRN to trace it back to its gate inward and P
+[358] P (Heading 3): 8.5.2 Non-Functional Requirements
+[359] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[360] P (List Paragraph): Traceability: PO → Gate Inward → GRN is linked by OrderNo and GateInwardNo, so any stock line can be
+[361] P (List Paragraph): Integrity: received quantity cannot exceed what is still pending on the PO line; the same invoice ca
+[362] P (List Paragraph): Atomic chain operations: creating a GRN (header, lines, stock update, status change) and deleting a 
+[363] P (List Paragraph): Responsiveness: the dependent dropdowns (party → open POs → PO items) answer in under 500 ms.
+[364] P (List Paragraph): Auditability: createdAt / updatedAt on every row; status values (Draft, InwardCreated) show progress
+[365] P (List Paragraph): CAP: consistency first – stock must never be counted twice or lost if two users receive against the 
+[366] P (Heading 3): 8.5.3 Tech Stack
+[367] TABLE (5x3): ['Concern', 'Choice', 'Why it fits this module']
+[368] P (Heading 3): 8.5.4 Back-of-the-Envelope Estimation
+[369] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[370] TABLE (7x3): ['Quantity', 'Estimate', 'Basis']
+[371] P (Heading 3): 8.5.5 Low-Level Architecture
+[372] P (None):  [DRAWINGS: 1]
+[373] P (None): Fig 8.5.A Low-level architecture – GOODS INWARD & INVENTORY RECEIPT (GRN)
+[374] P (None): Request flow:
+[375] P (List Paragraph): GateInward.jsx: the user chooses a party; gateInwardController returns that party’s open POs (getPur
+[376] P (List Paragraph): Save writes Gate_inward and Gate_inward_details; the duplicate-invoice check runs first.
+[377] P (List Paragraph): Receipt.jsx: the user chooses a party and PO; receiptController lists the available gate-inward batc
+[378] P (List Paragraph): Save writes Receipts and Receipt_details, updates stock, and moves the PO status forward in the same
+[379] P (List Paragraph): Bill Entry (next module) later reads the GRN by GRNNo.
+[380] P (Heading 3): 8.5.6 API Design
+[381] P (None): All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are re
+[382] TABLE (13x3): ['Method', 'Endpoint', 'Purpose / contract']
+[383] P (Heading 3): 8.5.7 DB Design
+[384] TABLE (5x3): ['Table', 'Keys & indexes', 'Key columns']
+[385] P (List Paragraph): Recommended additions: indexes on Gate_inward(OrderNo) and Receipts(PartyCode, InwardDate) to speed 
+[386] P (Heading 3): 8.5.8 Screenshots
+[387] P (None):  [DRAWINGS: 1]
+[388] P (None): fig 8.5.1 Gate inward list
+[389] P (None): The gate inward register displays incoming consignments and provides search, supplier filtering, and
+[390] P (None):  [DRAWINGS: 1]
+[391] P (None): fig 8.5.2 Selecting a supplier for gate inward
+[392] P (None): The supplier dropdown identifies the party delivering materials before a purchase order is selected.
+[393] P (None):  [DRAWINGS: 1]
+[394] P (None): fig 8.5.3 Linking gate inward to a purchase order
+[395] P (None): The purchase order dropdown links the inward record to an order for the selected supplier. The scree
+[396] P (None):  [DRAWINGS: 1]
+[397] P (None): fig 8.5.4 Goods receipt register
+[398] P (None): The receipt list displays goods receipt records with supplier, purchase order, invoice, inward, and 
+[399] P (None):  [DRAWINGS: 1]
+[400] P (None): fig 8.5.5 Creating a goods receipt
+[401] P (None): The receipt form links a supplier and purchase order, captures invoice information, and allows recei
+[402] P (None):  [DRAWINGS: 1]
+[403] P (None): fig 8.5.6 Goods receipt financial summary
+[404] P (None): The receipt summary displays received item values, discount, tax, and transport charges before the r
+[405] P (None):  [DRAWINGS: 1]
+[406] P (None): fig 8.5.7 Editing a goods receipt
+[407] P (None): An existing receipt can be opened to review or update its invoice, item, and financial details and s
+[408] P (None):  [DRAWINGS: 1]
+[409] P (None): fig 8.5.8 Expanded goods receipt details
+[410] P (None): The expanded receipt shows linked gate inward information and the received item quantities, rates, t
+[411] P (Heading 2): 8.6 BILL ENTRY
+[412] P (Heading 3): 8.6.0 Purpose & Scope
+[413] P (None): Handles financial booking of supplier invoices against physically received goods, and records the ve
+[414] P (Heading 3): 8.6.1 Functional Requirements
+[415] P (None): What the module must do:
+[416] P (List Paragraph): Book a supplier invoice against a received GRN: pick the party, then the linked gate inward / GRN; t
+[417] P (List Paragraph): Capture party bill number, bill date, accounting date and purchase type; the narration is pre-filled
+[418] P (List Paragraph): Show billed items (item, PO, quantity, rate, amount) taken from the GRN, with a financial breakdown:
+[419] P (List Paragraph): Support both intra-state (CGST + SGST) and inter-state (IGST) tax amounts.
+[420] P (List Paragraph): Three-way traceability: PO, GRN and bill are linked, so the ordered rate, the received quantity and 
+[421] P (List Paragraph): Duplicate bill check, edit, delete (with the linked chain) and print of the voucher.
+[422] P (List Paragraph): Bill Verify: record the verification date, payment status and remarks for each booked bill.
+[423] P (Heading 3): 8.6.2 Non-Functional Requirements
+[424] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[425] P (List Paragraph): No double billing: the schema enforces one bill per GRN and per gate inward through unique keys.
+[426] P (List Paragraph): Financial accuracy: all amounts are DECIMAL(15,2); the grand total is recomputed on the server.
+[427] P (List Paragraph): Atomicity: bill header, billed lines and the chain delete run in one transaction.
+[428] P (List Paragraph): Auditability: accounting date, voucher number, verification date and remarks are stored for each bil
+[429] P (List Paragraph): Print performance: a voucher renders in under 1 second.
+[430] P (List Paragraph): CAP: consistency first – the accounts team must always see the same bill amount as the store.
+[431] P (Heading 3): 8.6.3 Tech Stack
+[432] TABLE (5x3): ['Concern', 'Choice', 'Why it fits this module']
+[433] P (Heading 3): 8.6.4 Back-of-the-Envelope Estimation
+[434] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[435] TABLE (7x3): ['Quantity', 'Estimate', 'Basis']
+[436] P (Heading 3): 8.6.5 Low-Level Architecture
+[437] P (None):  [DRAWINGS: 1]
+[438] P (None): Fig 8.6.A Low-level architecture – BILL ENTRY
+[439] P (None): Request flow:
+[440] P (List Paragraph): BillEntry.jsx asks billEntryController for parties that still have unbilled goods (getAvailableParti
+[441] P (List Paragraph): After the party is chosen, available gate inwards and GRNs are listed; selecting one loads its items
+[442] P (List Paragraph): The user completes the bill details; save writes Bill_entries and Bill_entry_details in one transact
+[443] P (List Paragraph): BillVerify.jsx lists bills by party (getBillsByParty) and stores the verification record in bill_ver
+[444] P (List Paragraph): Print uses getPrintData to render the voucher.
+[445] P (Heading 3): 8.6.6 API Design
+[446] P (None): All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are re
+[447] TABLE (11x3): ['Method', 'Endpoint', 'Purpose / contract']
+[448] P (Heading 3): 8.6.7 DB Design
+[449] TABLE (4x3): ['Table', 'Keys & indexes', 'Key columns']
+[450] P (List Paragraph): Relationship: one GRN is billed by exactly one bill entry, and one bill entry is verified by one ver
+[451] P (List Paragraph): The bill_verify table is shown in the class diagram and ER diagram; its column list is not part of t
+[452] P (Heading 3): 8.6.8 Screenshots
+[453] P (None):  [DRAWINGS: 1]
+[454] P (None): fig 8.6.1 Bill entry register
+[455] P (None): The bill register displays supplier invoice records, accounting dates, purchase types, and amounts, 
+[456] P (None):  [DRAWINGS: 1]
+[457] P (None): fig 8.6.2 Creating a supplier bill entry
+[458] P (None): The bill form selects a supplier and receipt and captures invoice, accounting date, and purchase typ
+[459] P (None):  [DRAWINGS: 1]
+[460] P (None): fig 8.6.3 Bill entry financial breakdown
+[461] P (None): The billing area shows item values and fields for discount, tax, freight, and other charges, along w
+[462] P (None):  [DRAWINGS: 1]
+[463] P (None): fig 8.6.4 Expanded bill entry details
+[464] P (None): Expanding a bill reveals the linked inward records and billed line items for reviewing quantities, r
+[465] P (Heading 2): 8.7 MATERIAL REQUISITION & GATE PASS MOVEMENT
+[466] P (Heading 3): 8.7.0 Purpose & Scope
+[467] P (None): Controls internal inventory consumption by departments and regulates the physical outbound / inbound
+[468] P (Heading 3): 8.7.1 Functional Requirements
+[469] P (None): What the module must do:
+[470] P (List Paragraph): Item Issue: create an issue voucher (for example ISS-0004) with date, department, indent number, app
+[471] P (List Paragraph): Show the department’s items with available stock and a status badge (In stock, Low stock, Out of sto
+[472] P (List Paragraph): Filter the item list, see the count of selected items and total units, then confirm & save; the stoc
+[473] P (List Paragraph): Edit or delete an existing issue; list issues by department.
+[474] P (List Paragraph): Gate Pass Out / In: record tools, machinery and non-inventory goods leaving or re-entering the premi
+[475] P (List Paragraph): Returnable (RGP) and non-returnable (NRGP) passes, and return reconciliation of items coming back ag
+[476] P (Heading 3): 8.7.2 Non-Functional Requirements
+[477] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[478] P (List Paragraph): Stock integrity: stock must never go negative – the quantity is validated on the server inside a tra
+[479] P (List Paragraph): Concurrency: two storekeepers issuing the same item at the same moment are serialized by the row loc
+[480] P (List Paragraph): Usability: a department can have hundreds of items; the list is filterable and shows the remaining s
+[481] P (List Paragraph): Accountability: each issue stores the department, indent number, approver and employee name for ever
+[482] P (List Paragraph): CAP: consistency first – an out-of-date stock figure would allow over-issue, so correctness outranks
+[483] P (Heading 3): 8.7.3 Tech Stack
+[484] TABLE (5x3): ['Concern', 'Choice', 'Why it fits this module']
+[485] P (Heading 3): 8.7.4 Back-of-the-Envelope Estimation
+[486] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[487] TABLE (8x3): ['Quantity', 'Estimate', 'Basis']
+[488] P (Heading 3): 8.7.5 Low-Level Architecture
+[489] P (None):  [DRAWINGS: 1]
+[490] P (None): Fig 8.7.A Low-level architecture – MATERIAL REQUISITION & GATE PASS MOVEMENT
+[491] P (None): Request flow:
+[492] P (List Paragraph): ItemIssue.jsx loads departments and, when one is chosen, its items with current stock (getItemsByDep
+[493] P (List Paragraph): The user enters issue quantities; the page flags any quantity above the available stock.
+[494] P (List Paragraph): Save sends header and lines; itemIssueController re-checks stock inside a transaction, writes Item_i
+[495] P (List Paragraph): GatePassOut.jsx / GatePassIn.jsx record movement; a returning item is matched against its open outwa
+[496] P (Heading 3): 8.7.6 API Design
+[497] P (None): All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are re
+[498] TABLE (8x3): ['Method', 'Endpoint', 'Purpose / contract']
+[499] P (Heading 3): 8.7.7 DB Design
+[500] TABLE (4x3): ['Table', 'Keys & indexes', 'Key columns']
+[501] P (List Paragraph): The four gate pass models exist in the backend (Fig 8.1.6); their column definitions are not include
+[502] P (List Paragraph): Recommended addition: an index on Item_issue(Department, IssueDate) for the department-wise issue re
+[503] P (Heading 3): 8.7.8 Screenshots
+[504] P (None):  [DRAWINGS: 1]
+[505] P (None): fig 8.7.1 Creating a gate pass outward
+[506] P (None): The outward gate pass form records pass details and destination information and allows items and qua
+[507] P (None):  [DRAWINGS: 1]
+[508] P (None): fig 8.7.2 Editing a gate pass outward
+[509] P (None): The edit form lets the user revise an existing outward gate pass, including its movement details and
+[510] P (Heading 2): 8.8 EXECUTIVE DASHBOARD & BUSINESS ANALYTICS
+[511] P (Heading 3): 8.8.0 Purpose & Scope
+[512] P (None): Provides operational transparency and business intelligence through live KPI monitoring and multi-cr
+[513] P (Heading 3): 8.8.1 Functional Requirements
+[514] P (None): What the module must do:
+[515] P (List Paragraph): Dashboard KPI cards: active purchase orders, items in stock, gate passes outward and pending verific
+[516] P (List Paragraph): Monthly transactions chart (POs, gate-in, gate-out), a status overview and the recent gate inward lo
+[517] P (List Paragraph): Low-stock alerts: flag items whose stock has fallen to or below the configured minimum (OpeningQty ≤
+[518] P (List Paragraph): Reports & Registers in six categories – Purchase, Billing, Receipt, Stock, Issue and Others – each w
+[519] P (List Paragraph): Filters: from / to date, report name, department (multi-select), party and item; preview on screen, 
+[520] P (List Paragraph): Export: formatted Excel (.xlsx) workbooks built with ExcelJS, and printable PDF documents.
+[521] P (Heading 3): 8.8.2 Non-Functional Requirements
+[522] P (None): How well the module must do it (the system-wide baseline in the chapter introduction also applies):
+[523] P (List Paragraph): Read-only: the module never modifies transactional data, so it cannot corrupt stock or bills.
+[524] P (List Paragraph): Performance: a one-year report completes in under 3 seconds and the dashboard in under 2 seconds.
+[525] P (List Paragraph): Memory safety: large exports are streamed to the browser instead of being assembled fully in memory.
+[526] P (List Paragraph): Freshness: figures reflect committed data; the Refresh button re-queries on demand rather than polli
+[527] P (List Paragraph): Scalability path: heavy reports can move to a MySQL read replica later without changing the API.
+[528] P (List Paragraph): CAP: consistency preferred – a report must match what the transaction screens show.
+[529] P (Heading 3): 8.8.3 Tech Stack
+[530] TABLE (6x3): ['Concern', 'Choice', 'Why it fits this module']
+[531] P (Heading 3): 8.8.4 Back-of-the-Envelope Estimation
+[532] P (None): Figures marked “live” come from the running system; the rest are working assumptions used to size th
+[533] TABLE (7x3): ['Quantity', 'Estimate', 'Basis']
+[534] P (Heading 3): 8.8.5 Low-Level Architecture
+[535] P (None):  [DRAWINGS: 1]
+[536] P (None): Fig 8.8.A Low-level architecture – EXECUTIVE DASHBOARD & BUSINESS ANALYTICS
+[537] P (None): Request flow:
+[538] P (List Paragraph): Dashboard.jsx calls the dashboard endpoints on load and on Refresh.
+[539] P (List Paragraph): Reports.jsx sends the chosen report name, date range and department / party filters.
+[540] P (List Paragraph): reportController builds one SQL query per report, joins header and detail tables, groups by departme
+[541] P (List Paragraph): Save Report asks the same controller to stream the rows into an ExcelJS workbook, which the browser 
+[542] P (Heading 3): 8.8.6 API Design
+[543] P (None): All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are re
+[544] TABLE (6x3): ['Method', 'Endpoint', 'Purpose / contract']
+[545] P (Heading 3): 8.8.7 DB Design
+[546] TABLE (3x3): ['Table', 'Keys & indexes', 'Key columns']
+[547] P (List Paragraph): Recommended indexes for report speed as data grows: OrderDate, InwardDate, BillDate and IssueDate on
+[548] P (Heading 3): 8.8.8 Screenshots
+[549] P (None):  [DRAWINGS: 1]
+[550] P (None): fig 8.8.1 Operational dashboard
+[551] P (None): The dashboard summarizes store activity through metric cards, monthly charts, and recent purchase or
+[552] P (None):  [DRAWINGS: 1]
+[553] P (None): fig 8.8.2 Department wise issue report
+[554] P (None): The report screen uses filters and selectable columns to generate a department wise item issue repor
+[555] P (None):  [DRAWINGS: 1]
+[556] P (None): fig 8.8.3 Date wise order report
+[557] P (None): The reporting screen displays order records for the selected criteria, including supplier and value 
+[558] P (None): CHAPTER 9
+[559] P (Heading 1): CONCLUSION
+[560] P (None): The Store Management System provides a complete digital solution for managing the major activities i

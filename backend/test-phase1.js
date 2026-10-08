@@ -42,7 +42,7 @@ async function runTests() {
 
   // 4. Seeded Accounts Password Hash Verification
   const seededAdmin = await query.get("SELECT password FROM users WHERE email = 'admin@farmconnect.com'");
-  assert(seededAdmin && seededAdmin.password.startsWith("pbkdf2:sha512:"), "Seeded admin password is securely hashed in SQLite database");
+  assert(seededAdmin && seededAdmin.password.startsWith("pbkdf2:sha512:"), "Seeded admin password is securely hashed in MySQL database");
 
   const adminVerify = verifyPassword("admin123", seededAdmin.password);
   assert(adminVerify.verified === true, "Seeded admin credentials verify cleanly");

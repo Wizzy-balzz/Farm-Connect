@@ -1,21 +1,23 @@
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.js";
+import { useLanguage } from "../../hooks/useLanguage.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
-import { apiFetch } from "../../services/api.js";
+import { apiFetch, apiFetchBlob } from "../../services/api.js";
 import { Button } from "../common/Button.jsx";
 import { Badge } from "../common/Badge.jsx";
 import { Card } from "../common/Card.jsx";
 import { Avatar } from "../common/Avatar.jsx";
-import { Sprout, Check, Search, AlertTriangle, ArrowLeft } from "../icons/Icons.jsx";
+import { Sprout, X } from "../icons/Icons.jsx";
+import { ActionConfirmationCard } from "./ActionConfirmationCard.jsx";
 
 const SUGGESTED_PROMPTS = {
   farmer: [
+    "Should I sell my tomatoes this week?",
+    "Review farm health and selling opportunities.",
     "Which products are selling fastest?",
     "Which products are low in stock?",
-    "How much revenue did I make this month?",
-    "Show my pending orders.",
-    "Compare my prices with recent sales."
+    "How much revenue did I make this month?"
   ],
   vendor: [
     "Find 500 kg organic tomatoes.",
@@ -31,8 +33,18 @@ const SUGGESTED_PROMPTS = {
   ]
 };
 
+function createChatMessage(role, content) {
+  return {
+    id: `${role}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    role,
+    content,
+    createdAt: new Date().toISOString()
+  };
+}
+
 function AiChatDrawerBase() {
   const { user, isAuthenticated } = useAuth();
+  const { lang } = useLanguage();
   const { notifySuccess, notifyError } = useNotifications();
   const navigate = useNavigate();
 
@@ -43,10 +55,25 @@ function AiChatDrawerBase() {
   const [conversationId, setConversationId] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [listening, setListening] = useState(false);
   const [actionConfirm, setActionConfirm] = useState(null);
+  const [unreadInsightsCount, setUnreadInsightsCount] = useState(0);
+
+  // Phase 3D-2: Backend Voice STT (MediaRecorder) States
+  const [recordingState, setRecordingState] = useState("idle"); // "idle" | "recording" | "transcribing"
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+
+  // Phase 3D-2: Backend Speech Synthesis (TTS) States
+  const [playingMessageId, setPlayingMessageId] = useState(null);
+  const [loadingAudioId, setLoadingAudioId] = useState(null);
+  const activeAudioRef = useRef(null);
+  const activeAudioUrlRef = useRef(null);
 
   const messagesEndRef = useRef(null);
+  const isSubmittingRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -57,6 +84,53 @@ function AiChatDrawerBase() {
       scrollToBottom();
     }
   }, [messages, isOpen]);
+
+  // Close drawer on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Contextual AI prompt listener (from Decision Cards, Signals, Opportunities)
+  useEffect(() => {
+    const handleOpenChat = (e) => {
+      const prompt = e.detail?.prompt;
+      setIsOpen(true);
+      if (prompt && typeof prompt === "string") {
+        setInputPrompt(prompt);
+      }
+    };
+    window.addEventListener("fc-open-ai-chat", handleOpenChat);
+    return () => window.removeEventListener("fc-open-ai-chat", handleOpenChat);
+  }, []);
+
+  // Fetch real active proactive agricultural insights count for notification badge
+  useEffect(() => {
+    let isSubscribed = true;
+    async function loadInsights() {
+      if (!isAuthenticated || !user) return;
+      try {
+        const data = await apiFetch(`/api/ai/insights?lang=${lang || "en"}&status=active`);
+        if (isSubscribed && data && Array.isArray(data.insights)) {
+          setUnreadInsightsCount(data.insights.length);
+        }
+      } catch {
+        /* ignore - never show fake counts */
+      }
+    }
+
+    void loadInsights();
+    const handleUpdate = () => { void loadInsights(); };
+    window.addEventListener("fc-insights-updated", handleUpdate);
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener("fc-insights-updated", handleUpdate);
+    };
+  }, [isAuthenticated, user, lang]);
 
   // Fetch conversation history when drawer opens
   const fetchConversations = useCallback(async () => {
@@ -72,10 +146,23 @@ function AiChatDrawerBase() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (isOpen) {
-      fetchConversations();
+    if (!isOpen || !isAuthenticated) return;
+    let isSubscribed = true;
+    async function loadConvs() {
+      try {
+        const data = await apiFetch("/api/ai/conversations");
+        if (isSubscribed && data && data.conversations) {
+          setConversations(data.conversations);
+        }
+      } catch {
+        /* ignore fetch history error */
+      }
     }
-  }, [isOpen, fetchConversations]);
+    void loadConvs();
+    return () => {
+      isSubscribed = false;
+    };
+  }, [isOpen, isAuthenticated]);
 
   // Load specific conversation thread
   const loadConversation = async (convId) => {
@@ -112,14 +199,11 @@ function AiChatDrawerBase() {
   // Send message to AI Assistant
   const handleSendMessage = async (textToSend) => {
     const promptText = textToSend || inputPrompt;
-    if (!promptText || !promptText.trim() || loading) return;
+    if (!promptText || !promptText.trim()) return;
+    if (loading || isSubmittingRef.current) return;
 
-    const userMsg = {
-      id: `u_${Date.now()}`,
-      role: "user",
-      content: promptText.trim(),
-      createdAt: new Date().toISOString()
-    };
+    isSubmittingRef.current = true;
+    const userMsg = createChatMessage("user", promptText.trim());
 
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInputPrompt("");
@@ -148,50 +232,280 @@ function AiChatDrawerBase() {
           setActionConfirm(aiMsg.actionSuggestion);
         }
       }
-    } catch {
-      const fallbackMsg = {
-        id: `err_${Date.now()}`,
-        role: "assistant",
-        content: "FarmConnect AI is temporarily unavailable. You can continue using FarmConnect normally.",
-        createdAt: new Date().toISOString()
-      };
+    } catch (err) {
+      console.warn("[AiChatDrawer] Chat request error:", err);
+
+      let errorNotice = "FarmConnect AI is temporarily unavailable. You can continue using FarmConnect normally.";
+      if (err?.status === 401) {
+        errorNotice = "Your session has expired. Please log in again to use FarmConnect AI.";
+      } else if (err?.status === 403) {
+        errorNotice = "Your account role is not authorized for this AI action.";
+      } else if (err?.status === 429) {
+        errorNotice = "FarmConnect AI has reached its API usage limit. AI responses will resume when the quota resets.";
+      } else if (import.meta.env.DEV && err?.status) {
+        errorNotice += ` [HTTP ${err.status}]`;
+      }
+
+      const fallbackMsg = createChatMessage("assistant", errorNotice);
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };
 
-  // Web Speech API Voice Input
-  const handleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      notifyError("Voice input is not supported in this browser.");
+  // Cleanup audio & recording on unmount or drawer close
+  const stopAudio = useCallback(() => {
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current.src = "";
+      activeAudioRef.current = null;
+    }
+    if (activeAudioUrlRef.current) {
+      URL.revokeObjectURL(activeAudioUrlRef.current);
+      activeAudioUrlRef.current = null;
+    }
+    setPlayingMessageId(null);
+    setLoadingAudioId(null);
+  }, []);
+
+  const cleanupRecording = useCallback(() => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {
+        /* noop */
+      }
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+    audioChunksRef.current = [];
+    setRecordingState("idle");
+    setRecordingDuration(0);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (activeAudioRef.current) {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.src = "";
+        activeAudioRef.current = null;
+      }
+      if (activeAudioUrlRef.current) {
+        URL.revokeObjectURL(activeAudioUrlRef.current);
+        activeAudioUrlRef.current = null;
+      }
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      if (activeAudioRef.current) {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.src = "";
+        activeAudioRef.current = null;
+      }
+      if (activeAudioUrlRef.current) {
+        URL.revokeObjectURL(activeAudioUrlRef.current);
+        activeAudioUrlRef.current = null;
+      }
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+    }
+  }, [isOpen]);
+
+  // Supported audio MIME types detector
+  const getSupportedAudioMimeType = () => {
+    if (typeof MediaRecorder === "undefined") return "";
+    const types = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+      "audio/mp4",
+      "audio/wav"
+    ];
+    return types.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+  };
+
+  // Phase 3D-2: Backend MediaRecorder Voice STT
+  const startVoiceRecording = async () => {
+    if (recordingState === "recording") {
+      stopRecordingAndTranscribe();
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+      notifyError("Voice audio recording is not supported in this browser.");
       return;
     }
 
     try {
-      const recognition = new SpeechRecognition();
-      recognition.lang = localStorage.getItem("farmconnect-language") === "ta" ? "ta-IN" : (localStorage.getItem("farmconnect-language") === "hi" ? "hi-IN" : "en-US");
-      recognition.interimResults = false;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
 
-      recognition.onstart = () => setListening(true);
-      recognition.onend = () => setListening(false);
-      recognition.onerror = () => {
-        setListening(false);
-        notifyError("Voice input failed or was denied.");
-      };
+      const mimeType = getSupportedAudioMimeType();
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        if (transcript) {
-          setInputPrompt(transcript);
-          handleSendMessage(transcript);
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
       };
 
-      recognition.start();
-    } catch {
-      notifyError("Voice input initialization failed.");
+      recorder.onstart = () => {
+        setRecordingState("recording");
+        setRecordingDuration(0);
+        recordingTimerRef.current = setInterval(() => {
+          setRecordingDuration((prev) => prev + 1);
+        }, 1000);
+      };
+
+      recorder.start(250);
+    } catch (err) {
+      console.error("Microphone access error:", err);
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        notifyError("Microphone permission was denied. Please allow microphone access in your browser settings.");
+      } else {
+        notifyError("Could not access microphone.");
+      }
+      cleanupRecording();
+    }
+  };
+
+  const cancelVoiceRecording = () => {
+    cleanupRecording();
+    notifySuccess("Voice recording cancelled.");
+  };
+
+  const stopRecordingAndTranscribe = () => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state === "inactive") {
+      cleanupRecording();
+      return;
+    }
+
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+
+    setRecordingState("transcribing");
+
+    recorder.onstop = async () => {
+      try {
+        const mimeType = recorder.mimeType || "audio/webm";
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+
+        if (audioBlob.size === 0) {
+          notifyError("No audio was recorded. Please speak clearly into your microphone.");
+          setRecordingState("idle");
+          return;
+        }
+
+        const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : mimeType.includes("wav") ? "wav" : "webm";
+        const formData = new FormData();
+        formData.append("audio", audioBlob, `voice_recording.${ext}`);
+        formData.append("language", lang || "en");
+        formData.append("transcribeOnly", "true");
+        if (conversationId) formData.append("conversationId", conversationId);
+
+        const data = await apiFetch("/api/ai/voice", {
+          method: "POST",
+          body: formData
+        });
+
+        if (data && data.transcript) {
+          setInputPrompt(data.transcript);
+          notifySuccess("Speech transcribed! Review or edit before sending.");
+        } else {
+          notifyError("Could not transcribe speech. Please try again.");
+        }
+      } catch (err) {
+        console.error("Voice transcription error:", err);
+        notifyError(err.message || "Audio transcription failed.");
+      } finally {
+        if (mediaStreamRef.current) {
+          mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+          mediaStreamRef.current = null;
+        }
+        audioChunksRef.current = [];
+        setRecordingState("idle");
+        setRecordingDuration(0);
+      }
+    };
+
+    recorder.stop();
+  };
+
+  // Phase 3D-2: Backend Speech Synthesis (TTS) Playback
+  const handlePlayTts = async (messageId, text) => {
+    if (playingMessageId === messageId) {
+      stopAudio();
+      return;
+    }
+
+    stopAudio();
+    setLoadingAudioId(messageId);
+
+    try {
+      const cleanText = text
+        .replace(/[*#_`~]/g, "")
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+        .slice(0, 1000);
+
+      const blob = await apiFetchBlob("/api/ai/tts", {
+        method: "POST",
+        body: JSON.stringify({
+          text: cleanText,
+          language: lang || "en"
+        })
+      });
+
+      const audioUrl = URL.createObjectURL(blob);
+      activeAudioUrlRef.current = audioUrl;
+
+      const audio = new Audio(audioUrl);
+      activeAudioRef.current = audio;
+
+      audio.onended = () => {
+        stopAudio();
+      };
+
+      audio.onerror = () => {
+        notifyError("Voice synthesis playback failed.");
+        stopAudio();
+      };
+
+      await audio.play();
+      setPlayingMessageId(messageId);
+    } catch (err) {
+      console.error("TTS playback error:", err);
+      notifyError(err.message || "Failed to synthesize speech audio.");
+      stopAudio();
+    } finally {
+      setLoadingAudioId(null);
     }
   };
 
@@ -215,65 +529,47 @@ function AiChatDrawerBase() {
 
   return (
     <>
-      {/* Floating Trigger Button */}
+      {/* Dedicated Floating AI Launcher */}
       <div
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 9990
-        }}
+        className={`fc-ai-launcher-wrap ${isOpen ? "fc-ai-launcher-hidden" : ""}`}
+        aria-hidden={isOpen}
       >
-        <Button
-          variant="primary"
+        <button
+          type="button"
+          className="fc-ai-launcher-btn"
           onClick={() => setIsOpen(true)}
-          style={{
-            borderRadius: "30px",
-            padding: "12px 20px",
-            fontWeight: 800,
-            fontSize: "14px",
-            boxShadow: "0 8px 24px rgba(46, 125, 50, 0.35)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }}
+          aria-label="Open FarmConnect AI Assistant"
+          title="Open FarmConnect AI Assistant"
         >
-          <Sprout size={18} />
-          <span>🌱 FarmConnect AI</span>
-        </Button>
+          <span className="fc-ai-launcher-icon-box" aria-hidden="true">
+            <Sprout size={18} />
+          </span>
+          <span className="fc-ai-launcher-label">FarmConnect AI</span>
+          {unreadInsightsCount > 0 && (
+            <span
+              className="fc-ai-launcher-badge"
+              aria-label={`${unreadInsightsCount} unread smart insights`}
+              title={`${unreadInsightsCount} unread proactive smart insights`}
+            >
+              {unreadInsightsCount > 9 ? "9+" : unreadInsightsCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Slide-out Chat Drawer */}
       {isOpen && (
         <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0, 0, 0, 0.4)",
-            backdropFilter: "blur(2px)",
-            zIndex: 9999,
-            display: "flex",
-            justifyContent: "flex-end"
-          }}
+          className="fc-ai-drawer-overlay"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsOpen(false);
           }}
         >
           <div
-            className="fc-fade-in"
-            style={{
-              width: "100%",
-              maxWidth: "440px",
-              height: "100%",
-              background: "var(--surface)",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "var(--shadow-lg)",
-              borderLeft: "1px solid var(--border)"
-            }}
+            className="fc-ai-drawer-panel fc-fade-in"
+            role="dialog"
+            aria-modal="true"
+            aria-label="FarmConnect AI Assistant"
           >
             {/* Drawer Header */}
             <div
@@ -315,20 +611,30 @@ function AiChatDrawerBase() {
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    navigate("/profile");
+                    setIsOpen(false);
+                  }}
+                  style={{ fontSize: "12px" }}
+                  title="Manage AI Memory & Preferences in Profile"
+                  aria-label="Manage AI Memory & Preferences in Profile"
+                >
+                  🧠 Memory
+                </Button>
                 <Button size="sm" variant="outline" onClick={() => setShowHistory(!showHistory)} style={{ fontSize: "12px" }}>
                   {showHistory ? "Chat" : "History"}
                 </Button>
                 <button
+                  type="button"
+                  className="fc-ai-drawer-close"
                   onClick={() => setIsOpen(false)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "20px",
-                    cursor: "pointer",
-                    color: "var(--text-soft)"
-                  }}
+                  aria-label="Close FarmConnect AI Drawer"
+                  title="Close (Esc)"
                 >
-                  ✕
+                  <X size={18} />
                 </button>
               </div>
             </div>
@@ -433,17 +739,57 @@ function AiChatDrawerBase() {
                       </div>
                     </div>
 
-                    <span className="fc-soft" style={{ fontSize: "10px", marginTop: "4px", padding: "0 4px" }}>
-                      {m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px", padding: "0 4px" }}>
+                      <span className="fc-soft" style={{ fontSize: "10px" }}>
+                        {m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
+                      </span>
+                      {m.role !== "user" && m.content && (
+                        <button
+                          type="button"
+                          onClick={() => handlePlayTts(m.id, m.content)}
+                          disabled={loadingAudioId === m.id}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            color: playingMessageId === m.id ? "var(--brand)" : "var(--text-muted)",
+                            cursor: "pointer",
+                            padding: "2px 6px",
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 3,
+                            borderRadius: "4px"
+                          }}
+                          aria-label={playingMessageId === m.id ? "Stop audio playback" : "Listen to response via backend TTS"}
+                          title={playingMessageId === m.id ? "Stop audio playback" : "Listen to response via backend TTS"}
+                        >
+                          {loadingAudioId === m.id ? (
+                            "⏳ Synthesizing..."
+                          ) : playingMessageId === m.id ? (
+                            "⏹ Stop Audio"
+                          ) : (
+                            "🔊 Listen"
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
 
-                {/* Interactive Action Confirmation Banner */}
-                {actionConfirm && (
+                {/* Interactive Action Confirmation Banner / Proposal Card */}
+                {actionConfirm && actionConfirm.confirmationToken ? (
+                  <div style={{ marginBottom: "14px" }}>
+                    <ActionConfirmationCard
+                      action={actionConfirm}
+                      lang={lang}
+                      onActionComplete={() => setActionConfirm(null)}
+                    />
+                  </div>
+                ) : actionConfirm ? (
                   <Card style={{ padding: "14px", background: "var(--brand-light)", borderColor: "var(--brand)" }}>
                     <div style={{ fontSize: "13px", fontWeight: 700, marginBottom: "8px", color: "var(--brand-dark)" }}>
-                      💡 Suggested AI Action: {actionConfirm.label}
+                      💡 Suggested AI Action: {actionConfirm.label || actionConfirm.title || "Confirmation Required"}
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <Button size="sm" variant="primary" onClick={() => handleConfirmAction(actionConfirm)}>
@@ -454,7 +800,7 @@ function AiChatDrawerBase() {
                       </Button>
                     </div>
                   </Card>
-                )}
+                ) : null}
 
                 {loading && (
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-soft)", fontSize: "12.5px" }}>
@@ -473,50 +819,113 @@ function AiChatDrawerBase() {
                 borderTop: "1px solid var(--border)",
                 background: "var(--surface)",
                 display: "flex",
-                gap: "8px",
-                alignItems: "center"
+                flexDirection: "column",
+                gap: "8px"
               }}
             >
-              <button
-                type="button"
-                onClick={handleVoiceInput}
-                title="Voice Input"
-                style={{
-                  background: listening ? "var(--danger)" : "var(--bg-soft)",
-                  color: listening ? "#fff" : "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "50%",
-                  width: "36px",
-                  height: "36px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer"
-                }}
-              >
-                🎤
-              </button>
+              {/* Active Recording / Transcribing Indicator Banner */}
+              {recordingState === "recording" && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 12px",
+                    background: "var(--danger-light)",
+                    border: "1px solid var(--danger)",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "12.5px"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--danger)", fontWeight: 700 }}>
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--danger)", display: "inline-block" }} />
+                    Recording: 0:{String(recordingDuration).padStart(2, "0")}
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <Button size="sm" variant="ghost" onClick={cancelVoiceRecording} style={{ padding: "3px 8px", fontSize: "11.5px" }}>
+                      Cancel
+                    </Button>
+                    <Button size="sm" variant="primary" onClick={stopRecordingAndTranscribe} style={{ padding: "3px 10px", fontSize: "11.5px", fontWeight: 700 }}>
+                      Done (Transcribe)
+                    </Button>
+                  </div>
+                </div>
+              )}
 
-              <input
-                className="fc-input"
-                value={inputPrompt}
-                onChange={(e) => setInputPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSendMessage();
-                }}
-                placeholder={listening ? "Listening..." : "Ask FarmConnect AI..."}
-                disabled={loading}
-                style={{ flex: 1, fontSize: "13px" }}
-              />
+              {recordingState === "transcribing" && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 12px",
+                    background: "var(--brand-light)",
+                    border: "1px solid var(--brand)",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "12px",
+                    color: "var(--brand-dark)",
+                    fontWeight: 600
+                  }}
+                >
+                  <span>🎙️ Transcribing voice recording via backend STT service...</span>
+                </div>
+              )}
 
-              <Button
-                variant="primary"
-                onClick={() => handleSendMessage()}
-                disabled={loading || !inputPrompt.trim()}
-                style={{ padding: "8px 14px", fontWeight: 700 }}
-              >
-                Send
-              </Button>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={recordingState === "recording" ? stopRecordingAndTranscribe : startVoiceRecording}
+                  disabled={loading || recordingState === "transcribing"}
+                  title={recordingState === "recording" ? "Stop recording & transcribe" : "Record Voice via Backend STT"}
+                  aria-label={recordingState === "recording" ? "Stop recording & transcribe" : "Record Voice via Backend STT"}
+                  style={{
+                    background: recordingState === "recording" ? "var(--danger)" : "var(--bg-soft)",
+                    color: recordingState === "recording" ? "#fff" : "var(--text)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "50%",
+                    width: "36px",
+                    height: "36px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {recordingState === "transcribing" ? "⏳" : recordingState === "recording" ? "⏹" : "🎤"}
+                </button>
+
+                <input
+                  className="fc-input"
+                  value={inputPrompt}
+                  onChange={(e) => setInputPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder={
+                    recordingState === "recording"
+                      ? "Recording audio... speak now"
+                      : recordingState === "transcribing"
+                      ? "Transcribing voice input..."
+                      : "Ask FarmConnect AI..."
+                  }
+                  disabled={loading || recordingState === "transcribing"}
+                  style={{ flex: 1, fontSize: "13px" }}
+                />
+
+                <Button
+                  variant="primary"
+                  onClick={() => handleSendMessage()}
+                  disabled={loading || !inputPrompt.trim() || recordingState === "transcribing"}
+                  style={{ padding: "8px 14px", fontWeight: 700 }}
+                >
+                  Send
+                </Button>
+              </div>
             </div>
           </div>
         </div>

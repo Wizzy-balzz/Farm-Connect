@@ -1,23 +1,26 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useMemo, useCallback } from "react";
 import { apiFetch } from "../services/api.js";
+import { useLanguage } from "../hooks/useLanguage.js";
 
 export const DataContext = createContext(null);
 
 export function DataProvider({ children }) {
+  const { lang } = useLanguage();
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (forcedLang) => {
     try {
-      const data = await apiFetch("/api/products");
+      const targetLang = forcedLang || lang || "en";
+      const data = await apiFetch(`/api/products?lang=${encodeURIComponent(targetLang)}`);
       if (Array.isArray(data)) {
         setProducts(data);
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
     }
-  }, []);
+  }, [lang]);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -31,9 +34,12 @@ export function DataProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(lang);
+  }, [lang, fetchProducts]);
+
+  useEffect(() => {
     fetchOrders();
-  }, [fetchProducts, fetchOrders]);
+  }, [fetchOrders]);
 
   const addProduct = useCallback(async (payload) => {
     const newProduct = await apiFetch("/api/products", {

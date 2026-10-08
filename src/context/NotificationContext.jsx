@@ -78,6 +78,14 @@ export function NotificationProvider({ children }) {
         const msg = `⚠️ Low stock warning for ${data.productName} (${data.remainingStock} remaining)`;
         const id = uid("toast");
         dispatch({ type: "ADD_TOAST", payload: { id, text: msg, variant: "warning" } });
+      } else if (event === "chat:message") {
+        // Only show toast if user is not already looking at the chat page for that conversation
+        if (window.location.pathname.indexOf("/chat") === -1) {
+          const sender = data.senderName || "New message";
+          const snippet = data.message?.message ? (data.message.message.length > 50 ? `${data.message.message.substring(0, 50)}...` : data.message.message) : "Sent an attachment";
+          const id = uid("toast");
+          dispatch({ type: "ADD_TOAST", payload: { id, text: `💬 ${sender}: ${snippet}`, variant: "info" } });
+        }
       }
     });
 

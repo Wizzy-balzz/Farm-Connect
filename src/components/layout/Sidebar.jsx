@@ -2,10 +2,9 @@ import { memo } from "react";
 import { NavLink } from "react-router-dom";
 import { X } from "../icons/Icons.jsx";
 import {
-  ClipboardList, Package, ShoppingBag, Heart, Cart as CartIcon, Truck,
+  ClipboardList, Package, ShoppingBag, Heart, Cart as CartIcon, Truck, Sprout, TrendingUp,
 } from "../icons/Icons.jsx";
 import { useAuth } from "../../hooks/useAuth.js";
-import { useLanguage } from "../../hooks/useLanguage.js";
 
 const LayoutGrid = ({ size = 16 }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -21,29 +20,23 @@ const UserIcon = ({ size = 16 }) => (
   </svg>
 );
 
-const DollarIcon = ({ size = 16 }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-  </svg>
-);
-
 const ShieldIcon = ({ size = 16 }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
 
-const BarChartIcon = ({ size = 16 }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" />
-  </svg>
-);
-
 const FARMER_LINKS = [
   { path: "/farmer/dashboard", label: "Overview", icon: LayoutGrid },
   { path: "/farmer/farm", label: "My Farm", icon: Package },
+  { path: "/farmer/farming-guide", label: "Farming Guide", icon: Sprout },
+  { path: "/farmer/farm-planner", label: "Crop Planner", icon: TrendingUp },
+  { path: "/farmer/crop-health", label: "Crop Health", icon: Sprout },
+  { path: "/farmer/sell-smarter", label: "Sell Smarter", icon: TrendingUp },
+  { path: "/farmer/value-addition", label: "Value Addition", icon: Sprout },
   { path: "/farmer/products", label: "Harvest Listings", icon: ShoppingBag },
   { path: "/farmer/orders", label: "Orders", icon: Truck },
+  { path: "/chat", label: "Messages", icon: ClipboardList },
   { path: "/farmer/profile", label: "Profile", icon: UserIcon },
 ];
 

@@ -102,12 +102,42 @@ export async function fetchPlaces(countryCode, regionCode, districtCode) {
   return [];
 }
 
+/**
+ * Standardize location object into reusable FarmConnect format
+ */
+export function normalizeLocation(loc = {}) {
+  const latitude = parseFloat(loc.latitude ?? loc.lat ?? 0);
+  const longitude = parseFloat(loc.longitude ?? loc.lng ?? 0);
+
+  return {
+    latitude: isNaN(latitude) ? null : latitude,
+    longitude: isNaN(longitude) ? null : longitude,
+    lat: isNaN(latitude) ? null : latitude, // Alias for backward compatibility
+    lng: isNaN(longitude) ? null : longitude, // Alias for backward compatibility
+    address: loc.address || loc.formattedAddress || "",
+    city: loc.city || loc.placeName || "",
+    district: loc.district || "",
+    state: loc.state || loc.region || "",
+    region: loc.region || loc.state || "", // Alias for existing components
+    pincode: loc.pincode || loc.postalCode || "",
+    postalCode: loc.postalCode || loc.pincode || "",
+    country: loc.country || loc.countryName || "India",
+    countryCode: (loc.countryCode || "IN").toUpperCase(),
+    countryName: loc.countryName || loc.country || "India",
+    placeName: loc.placeName || loc.city || "",
+    formattedAddress: loc.formattedAddress || loc.address || ""
+  };
+}
+
 export async function searchLocations(query, countryCode = "") {
   if (!query || query.trim().length < 2) return [];
   try {
     const res = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}&countryCode=${encodeURIComponent(countryCode)}`);
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        return data.map(normalizeLocation);
+      }
     }
   } catch (err) {
     console.warn("Location search failed:", err.message);
@@ -116,14 +146,16 @@ export async function searchLocations(query, countryCode = "") {
 }
 
 export async function reverseGeocodeLocation(lat, lng) {
-  if (!lat || !lng) return null;
+  if (lat === undefined || lat === null || lng === undefined || lng === null) return null;
   try {
     const res = await fetch(`/api/locations/reverse-geocode?lat=${lat}&lng=${lng}`);
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      return normalizeLocation(data);
     }
   } catch (err) {
     console.warn("Reverse geocode failed:", err.message);
   }
   return null;
 }
+

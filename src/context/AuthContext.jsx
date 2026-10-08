@@ -63,15 +63,33 @@ export function AuthProvider({ children }) {
     return CURRENT_FARMER;
   }, [user, role]);
 
-  const login = useCallback(async (email, password, selectedRole) => {
+  const login = useCallback(async (email, password) => {
     const data = await apiFetch("/api/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password, role: selectedRole })
+      body: JSON.stringify({ email, password })
     });
 
     const authUser = data.user;
     setUser(authUser);
     setRole(authUser.role);
+    return authUser;
+  }, []);
+
+  const loginWithGoogle = useCallback(async (credential, requestedRole) => {
+    const data = await apiFetch("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ credential, role: requestedRole })
+    });
+
+    if (data && data.requiresOnboarding) {
+      return data;
+    }
+
+    const authUser = data.user;
+    if (authUser) {
+      setUser(authUser);
+      setRole(authUser.role);
+    }
     return authUser;
   }, []);
 
@@ -131,6 +149,7 @@ export function AuthProvider({ children }) {
       role,
       isInitializing,
       login,
+      loginWithGoogle,
       logout,
       register,
       updateProfile,
@@ -145,6 +164,7 @@ export function AuthProvider({ children }) {
       role,
       isInitializing,
       login,
+      loginWithGoogle,
       logout,
       register,
       updateProfile,

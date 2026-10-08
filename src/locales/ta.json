@@ -33,7 +33,9 @@
     "per": "ஒரு",
     "qty": "எண்ணிக்கை",
     "lightMode": "லைட் மோட்",
-    "darkMode": "டார்க் மோட்"
+    "darkMode": "டார்க் மோட்",
+    "pageNotFound": "பக்கம் கிடைக்கவில்லை",
+    "pageNotFoundMsg": "நீங்கள் தேடும் பக்கம் இல்லை அல்லது நகர்த்தப்பட்டுள்ளது."
   },
   "navigation": {
     "appName": "FarmConnect",

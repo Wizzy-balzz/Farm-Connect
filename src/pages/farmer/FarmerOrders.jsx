@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, memo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Check,
   X,
@@ -23,6 +24,12 @@ import { useData } from "../../hooks/useData.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
+import {
+  getOrderStatusLabel,
+  getCategoryLabel,
+  getUnitLabel,
+  getGradeLabel,
+} from "../../utils/controlledVocabulary.js";
 
 const STATUS_FILTERS = [
   "All",
@@ -79,7 +86,8 @@ function getStatusBadgeVariant(status) {
 }
 
 function FarmerOrdersBase() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const navigate = useNavigate();
   const { farmerProfile, user } = useAuth();
   const { orders, products, updateOrderStatus, loading } = useData();
   const { notifySuccess, notifyError } = useNotifications();
@@ -220,7 +228,7 @@ function FarmerOrdersBase() {
                 onClick={() => setStatusFilter(s)}
                 style={{ fontSize: "12px", padding: "6px 14px" }}
               >
-                {s === "All" ? t("all") : s}
+                {s === "All" ? t("all") : getOrderStatusLabel(s, lang)}
               </button>
             ))}
           </div>
@@ -315,13 +323,13 @@ function FarmerOrdersBase() {
                           <div>
                             <strong style={{ fontSize: 13 }}>{prod?.name || "Crop Lot"}</strong>
                             <div className="fc-soft" style={{ fontSize: 10.5 }}>
-                              Grade {prod?.grade || "A"} • {prod?.category || "Produce"}
+                              Grade {getGradeLabel(prod?.grade, lang)} • {getCategoryLabel(prod?.category, lang)}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td>
-                        <strong>{o.qty}</strong> {prod?.unit || "units"}
+                        <strong>{o.qty}</strong> {getUnitLabel(prod?.unit, lang)}
                       </td>
                       <td>
                         <strong style={{ fontFamily: "var(--font-heading)", color: "var(--brand)" }}>
@@ -330,10 +338,19 @@ function FarmerOrdersBase() {
                       </td>
                       <td>{formatDate(o.createdAt)}</td>
                       <td>
-                        <Badge variant={badgeVariant}>{o.status}</Badge>
+                        <Badge variant={badgeVariant}>{getOrderStatusLabel(o.status, lang)}</Badge>
                       </td>
                       <td>
-                        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                        <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate(`/farmer/tracking/${o.id}`)}
+                            style={{ fontSize: 11, padding: "5px 8px" }}
+                            title="Track delivery on OpenStreetMap"
+                          >
+                            <TruckIcon size={11} /> Track
+                          </Button>
                           {step && (
                             <Button
                               size="sm"

@@ -3,6 +3,7 @@ import { Cart, Heart, Edit, Trash, Check } from "../icons/Icons.jsx";
 import { gradeColor } from "./gradeColor.js";
 import { formatCurrency } from "../../utils/formatters.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
+import { getCategoryLabel, getUnitLabel, getGradeLabel, getSystemTerm } from "../../utils/controlledVocabulary.js";
 import { Avatar, Badge, Skeleton } from "../common/index.js";
 
 const CATEGORY_FALLBACKS = {
@@ -25,38 +26,40 @@ function ProductCardBase({
   onView,
   onEdit,
   onDelete,
+  onManageTranslations,
   className = "",
   style = {},
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
 
-  if (!product) return null;
-
-  const color = gradeColor(product.grade);
-  const fallbackImg = CATEGORY_FALLBACKS[product.category] || CATEGORY_FALLBACKS.Vegetables;
-  const bgImg = imageError ? fallbackImg : product.imageUrl || fallbackImg;
-
   // Check if wholesale tiers exist
   const tierCount = useMemo(() => {
+    if (!product?.tierPrices) return 0;
     try {
       const parsed = JSON.parse(product.tierPrices || "{}");
       return Object.keys(parsed).length;
     } catch {
       return 0;
     }
-  }, [product.tierPrices]);
+  }, [product]);
 
   // Check if harvested within the last 7 days
   const isFresh = useMemo(() => {
-    if (!product.harvestDate) return false;
+    if (!product?.harvestDate) return false;
     const diffTime = Math.abs(new Date() - new Date(product.harvestDate));
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 7;
-  }, [product.harvestDate]);
+  }, [product]);
+
+  if (!product) return null;
+
+  const color = gradeColor(product.grade);
+  const fallbackImg = CATEGORY_FALLBACKS[product.category] || CATEGORY_FALLBACKS.Vegetables;
+  const bgImg = imageError ? fallbackImg : product.imageUrl || fallbackImg;
 
   const displayFarmerName = farmerName || "Verified Grower";
   const displayRegion = region || product.region || "Maharashtra";
@@ -161,7 +164,7 @@ function ProductCardBase({
                 boxShadow: "var(--shadow-sm)",
               }}
             >
-              ⏱️ FRESH HARVEST
+              ⏱️ {getSystemTerm("freshHarvest", lang).toUpperCase()}
             </span>
           )}
           {tierCount > 0 && (
@@ -176,7 +179,7 @@ function ProductCardBase({
                 boxShadow: "var(--shadow-sm)",
               }}
             >
-              🤝 BULK DISCOUNTS
+              🤝 {getSystemTerm("bulkDiscounts", lang).toUpperCase()}
             </span>
           )}
         </div>
@@ -208,9 +211,11 @@ function ProductCardBase({
       <div className="fc-product-body" style={{ padding: "14px 16px 16px" }}>
         {/* Category & Grade Tags */}
         <div className="fc-product-tags" style={{ marginBottom: 6 }}>
-          <span className="fc-tag-category">{product.category.toUpperCase()}</span>
+          <span className="fc-tag-category">
+            {(product.translatedCategory || getCategoryLabel(product.category, lang)).toUpperCase()}
+          </span>
           <span className="fc-tag-grade" style={{ background: color }}>
-            Grade {product.grade}
+            {product.translatedGrade || getGradeLabel(product.grade, lang)}
           </span>
         </div>
 
@@ -302,10 +307,10 @@ function ProductCardBase({
           }}
         >
           <div>
-            {t("stockLabel")}: <strong>{product.stock} {product.unit}</strong>
+            {getSystemTerm("stock", lang)}: <strong>{product.stock} {product.translatedUnit || getUnitLabel(product.unit, lang)}</strong>
           </div>
           <div>
-            MOQ: <strong>{product.moq || 10} {product.unit}</strong>
+            {getSystemTerm("moq", lang)}: <strong>{product.moq || 10} {product.translatedUnit || getUnitLabel(product.unit, lang)}</strong>
           </div>
         </div>
 
@@ -316,7 +321,7 @@ function ProductCardBase({
               {formatCurrency(product.price, product.currency)}
             </strong>
             <span className="fc-soft" style={{ fontSize: "11.5px" }}>
-              /{product.unit}
+              /{product.translatedUnit || getUnitLabel(product.unit, lang)}
             </span>
           </div>
 
@@ -338,6 +343,16 @@ function ProductCardBase({
             </button>
           ) : (
             <div className="fc-flex-gap-8">
+              {onManageTranslations && (
+                <button
+                  className="fc-icon-btn"
+                  onClick={() => onManageTranslations?.(product)}
+                  aria-label="Manage translations"
+                  title="Manage translations"
+                >
+                  🌐
+                </button>
+              )}
               <button
                 className="fc-icon-btn"
                 onClick={() => onEdit?.(product)}

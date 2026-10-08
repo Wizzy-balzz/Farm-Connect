@@ -1,7 +1,16 @@
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, ".env") });
+dotenv.config(); // fallback
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import { query } from "./database.js";
+import { OAuth2Client } from "google-auth-library";
+import { query, pool, getDatabaseStatus } from "./database.js";
+import { getAiDiagnostics } from "./ai/aiService.js";
 import {
   validatePassword,
   hashPassword,
@@ -31,25 +40,79 @@ import chatRouter from "./routes/chatRouter.js";
 import otpRouter from "./routes/otpRouter.js";
 import paymentRouter from "./routes/paymentRouter.js";
 import deliveryRouter from "./routes/deliveryRouter.js";
+import trackingRouter from "./routes/trackingRouter.js";
+import parcelRouter from "./routes/parcelRouter.js";
+import valueAdditionRouter from "./routes/valueAdditionRouter.js";
+import farmingGuideRouter from "./routes/farmingGuideRouter.js";
 import { calculateDeliveryCharge } from "./services/deliveryPricingService.js";
-import { verifyOtp } from "./services/otpService.js";
-
-dotenv.config();
+import { verifyOtp, normalizeContact, isOtpVerified, consumeVerifiedOtp } from "./services/otpService.js";
+import { verifySmtpConnection } from "./services/emailService.js";
+import { translateCategory, translateUnit, translateGrade } from "./utils/controlledVocabulary.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5000",
+  "http://127.0.0.1:5000"
+];
+
+app.disable("x-powered-by");
+
+// Defense-in-depth HTTP security headers middleware
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 
 // Custom cookie-parser middleware logic
 app.use((req, res, next) => {
   req.cookies = parseCookies(req);
   next();
+});
+
+// Root & Health Monitoring Endpoints
+app.get("/", (req, res) => {
+  const dbStatus = getDatabaseStatus();
+  res.json({
+    name: "FarmConnect Secure Backend API",
+    version: "2.0.0",
+    status: dbStatus.connected ? "HEALTHY" : "DEGRADED",
+    uptimeSeconds: Math.floor(process.uptime()),
+    database: dbStatus
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  const dbStatus = getDatabaseStatus();
+  res.status(dbStatus.connected ? 200 : 503).json({
+    status: dbStatus.connected ? "ok" : "degraded",
+    timestamp: new Date().toISOString(),
+    database: dbStatus
+  });
 });
 
 // Real-Time Event Stream Endpoint (SSE)
@@ -65,6 +128,12 @@ app.use("/api/conversations", chatRouter);
 app.use("/api/otp", otpRouter);
 app.use("/api/payments", paymentRouter);
 app.use("/api/delivery", deliveryRouter);
+app.use("/api/orders", trackingRouter);
+app.use("/api/farm/parcels", parcelRouter);
+app.use("/api/value-addition", valueAdditionRouter);
+app.use("/api/farming-guide", farmingGuideRouter);
+app.use("/api/farm-diary", farmingGuideRouter);
+app.use("/api/farm-planner", farmingGuideRouter);
 
 // Helper for standardized error responses
 function sendError(res, statusCode, code, message) {
@@ -72,6 +141,13 @@ function sendError(res, statusCode, code, message) {
     success: false,
     error: { code, message }
   });
+}
+
+function handleRouteError(res, err, defaultMsg = "An internal server error occurred.") {
+  if (err && (err.code === "DATABASE_UNAVAILABLE" || err.originalCode === "ECONNREFUSED")) {
+    return sendError(res, 503, "DATABASE_UNAVAILABLE", "Database connection is unreachable. Please start your MySQL service.");
+  }
+  return sendError(res, 500, "SERVER_ERROR", err?.message || defaultMsg);
 }
 
 function generateId(prefix = "id") {
@@ -97,6 +173,17 @@ function clearAuthCookie(res) {
 // ---------------- LOCATION ROUTES (PUBLIC) ----------------
 
 app.get("/api/locations/countries", async (req, res) => {
+  try {
+    const countries = await getCountries();
+    res.json(countries);
+  } catch (err) {
+    console.error("Fetch countries error:", err);
+    sendError(res, 500, "SERVER_ERROR", "Failed to fetch countries.");
+  }
+});
+
+// Alias for singular /api/location/countries
+app.get("/api/location/countries", async (req, res) => {
   try {
     const countries = await getCountries();
     res.json(countries);
@@ -173,7 +260,7 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
 
 // POST /api/auth/login
 app.post("/api/auth/login", async (req, res) => {
-  const { email, password, role } = req.body || {};
+  const { email, password } = req.body || {};
 
   if (!email || !password) {
     return sendError(res, 400, "INVALID_INPUT", "Email and password are required.");
@@ -189,11 +276,6 @@ app.post("/api/auth/login", async (req, res) => {
       return sendError(res, 401, "INVALID_CREDENTIALS", "Invalid email or password.");
     }
 
-    // Role check if provided
-    if (role && user.role !== role) {
-      return sendError(res, 401, "INVALID_ROLE", `Account role mismatch. This user is registered as a ${user.role}.`);
-    }
-
     const { verified, needsRehash } = verifyPassword(password, user.password);
 
     if (!verified) {
@@ -206,7 +288,7 @@ app.post("/api/auth/login", async (req, res) => {
       await query.run("UPDATE users SET password = ? WHERE id = ?", [newHash, user.id]);
     }
 
-    // Generate JWT and set httpOnly cookie
+    // Generate JWT and set httpOnly cookie with trusted database role
     const token = signJwt({ id: user.id, email: user.email, role: user.role });
     setAuthCookie(res, token);
 
@@ -216,7 +298,111 @@ app.post("/api/auth/login", async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    sendError(res, 500, "SERVER_ERROR", "Unable to sign in right now. Please try again.");
+    handleRouteError(res, err, "Unable to sign in right now. Please try again.");
+  }
+});
+
+// POST /api/auth/google - Authenticate or link user via Google OAuth ID Token
+app.post("/api/auth/google", async (req, res) => {
+  const { credential, role: requestedRole } = req.body || {};
+
+  if (!credential || typeof credential !== "string") {
+    return sendError(res, 400, "INVALID_INPUT", "Google ID token credential is required.");
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    return sendError(res, 500, "CONFIG_ERROR", "Google Client ID is not configured on the server.");
+  }
+
+  try {
+    const googleClient = new OAuth2Client(clientId);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: clientId,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return sendError(res, 401, "INVALID_TOKEN", "Failed to decode Google ID token payload.");
+    }
+
+    const { sub: googleId, email, email_verified, name } = payload;
+
+    // Strict validation of server-verified Google identity fields
+    if (!googleId || !email || email_verified !== true) {
+      return sendError(res, 401, "UNVERIFIED_ACCOUNT", "Google account email is missing or unverified.");
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // A. Find user by google_id
+    let user = await query.get("SELECT * FROM users WHERE google_id = ?", [googleId]);
+
+    // B. If not found by google_id, lookup by verified email
+    if (!user) {
+      user = await query.get("SELECT * FROM users WHERE LOWER(email) = ?", [normalizedEmail]);
+      if (user) {
+        // C. Safely link google_id and mark email_verified = 1, preserving existing role
+        await query.run(
+          "UPDATE users SET google_id = ?, email_verified = 1 WHERE id = ?",
+          [googleId, user.id]
+        );
+        user.google_id = googleId;
+        user.email_verified = 1;
+      }
+    }
+
+    // D. If no existing user found in database
+    if (!user) {
+      // Normalize requested onboarding role ('buyer' -> 'vendor')
+      const normalizedRole = requestedRole === "buyer" ? "vendor" : requestedRole;
+
+      // Reject any attempt to claim admin or invalid roles
+      if (normalizedRole && !["farmer", "vendor"].includes(normalizedRole)) {
+        return sendError(res, 400, "INVALID_ROLE", "Google registration only allows farmer or buyer roles.");
+      }
+
+      if (!normalizedRole) {
+        // Return clear response indicating registration / role onboarding is required
+        return res.status(200).json({
+          success: false,
+          requiresOnboarding: true,
+          error: {
+            code: "REGISTRATION_REQUIRED",
+            message: "No FarmConnect account found for this Google email. Please select your account type to proceed."
+          },
+          googleUser: {
+            googleId,
+            email: normalizedEmail,
+            name: name || normalizedEmail.split("@")[0]
+          }
+        });
+      }
+
+      // Provision new non-admin user with verified Google identity
+      const userId = generateId("usr");
+      const createdAt = new Date().toISOString();
+      await query.run(
+        `INSERT INTO users (id, email, google_id, role, name, email_verified, account_status, terms_accepted, terms_accepted_at, createdAt)
+         VALUES (?, ?, ?, ?, ?, 1, 'ACTIVE', 1, ?, ?)`,
+        [userId, normalizedEmail, googleId, normalizedRole, name || normalizedEmail.split("@")[0], createdAt, createdAt]
+      );
+
+      user = await query.get("SELECT * FROM users WHERE id = ?", [userId]);
+    }
+
+    // Generate standard FarmConnect JWT and set HttpOnly cookie with authoritative DB role
+    const token = signJwt({ id: user.id, email: user.email, role: user.role });
+    setAuthCookie(res, token);
+
+    return res.json({
+      success: true,
+      user: sanitizeUser(user)
+    });
+  } catch (err) {
+    console.error("Google Auth error:", err);
+    return sendError(res, 401, "INVALID_CREDENTIALS", "Google ID token verification failed: " + (err.message || "Invalid signature or audience."));
   }
 });
 
@@ -227,7 +413,18 @@ app.post("/api/auth/register", async (req, res) => {
     password,
     role,
     name,
+    mobile,
     farmName,
+    farmSize,
+    farmingExperience,
+    cropsGrown,
+    primaryCrop,
+    expectedQuantity,
+    businessName,
+    businessType,
+    gstin,
+    procurementCategories,
+    procurementQuantity,
     countryCode,
     countryName,
     region,
@@ -240,6 +437,8 @@ app.post("/api/auth/register", async (req, res) => {
     currency,
     securityQuestion,
     securityAnswer,
+    termsAccepted,
+    mobileVerified,
     about
   } = req.body || {};
 
@@ -247,8 +446,15 @@ app.post("/api/auth/register", async (req, res) => {
     return sendError(res, 400, "INVALID_INPUT", "Email, password, role, name, security question and answer are required.");
   }
 
-  if (!["farmer", "vendor", "admin"].includes(role)) {
-    return sendError(res, 400, "INVALID_ROLE", "Role must be farmer, vendor, or admin.");
+  if (termsAccepted === false) {
+    return sendError(res, 400, "TERMS_REQUIRED", "You must agree to the FarmConnect Terms & Conditions and Privacy Policy.");
+  }
+
+  // Normalize role input (accept 'buyer' as 'vendor')
+  const normalizedRole = role === "buyer" ? "vendor" : role;
+
+  if (!["farmer", "vendor"].includes(normalizedRole)) {
+    return sendError(res, 400, "INVALID_ROLE", "Public registration only allows farmer or buyer roles.");
   }
 
   const pwdValidation = validatePassword(password);
@@ -261,42 +467,72 @@ app.post("/api/auth/register", async (req, res) => {
   try {
     const existingUser = await query.get("SELECT id FROM users WHERE LOWER(email) = ?", [normalizedEmail]);
     if (existingUser) {
-      return sendError(res, 400, "EMAIL_EXISTS", "Email is already registered.");
+      return sendError(res, 400, "EMAIL_EXISTS", "An account with this email already exists. Please sign in.");
     }
 
-    const prefix = role === "farmer" ? "f" : (role === "vendor" ? "v" : "a");
+    const cleanEmail = normalizeContact(email);
+    const verified = await isOtpVerified(cleanEmail, "registration_verification");
+    if (!verified) {
+      return sendError(res, 400, "EMAIL_UNVERIFIED", "Email OTP verification is required before creating an account. Please verify your email.");
+    }
+    const isEmailVerified = true;
+
+    const prefix = normalizedRole === "farmer" ? "f" : "v";
     const id = generateId(prefix);
     const createdAt = new Date().toISOString();
-    const verificationStatus = role === "farmer" ? "Pending" : "Verified";
+    const verificationStatus = normalizedRole === "farmer" ? "Pending" : "Verified";
     const hashedPassword = hashPassword(password);
 
     await query.run(
-      `INSERT INTO users (id, email, password, role, name, farmName, countryCode, countryName, region, district, city, postalCode, address, lat, lng, currency, securityQuestion, securityAnswer, verificationStatus, about, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO users (
+        id, email, password, role, name, mobile, farmName, farmSize, farmingExperience, cropsGrown, primaryCrop, expectedQuantity,
+        businessName, businessType, gstin, procurementCategories, procurementQuantity,
+        countryCode, countryName, region, district, city, postalCode, address, lat, lng, currency,
+        securityQuestion, securityAnswer, verificationStatus, email_verified, mobile_verified, account_status, terms_accepted, terms_accepted_at, about, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         email.trim(),
         hashedPassword,
-        role,
+        normalizedRole,
         name.trim(),
+        mobile ? mobile.trim() : null,
         farmName ? farmName.trim() : null,
+        farmSize ? farmSize.trim() : null,
+        farmingExperience ? farmingExperience.trim() : null,
+        cropsGrown ? cropsGrown.trim() : null,
+        primaryCrop ? primaryCrop.trim() : null,
+        expectedQuantity ? expectedQuantity.trim() : null,
+        businessName ? businessName.trim() : null,
+        businessType ? businessType.trim() : null,
+        gstin ? gstin.trim() : null,
+        procurementCategories ? procurementCategories.trim() : null,
+        procurementQuantity ? procurementQuantity.trim() : null,
         countryCode || "IN",
         countryName || "India",
-        region ? region.trim() : null,
-        district ? district.trim() : null,
-        city ? city.trim() : null,
-        postalCode ? postalCode.trim() : null,
-        address ? address.trim() : null,
-        lat !== undefined && lat !== null ? parseFloat(lat) : null,
-        lng !== undefined && lng !== null ? parseFloat(lng) : null,
+        region || null,
+        district || null,
+        city || null,
+        postalCode || null,
+        address || null,
+        lat || null,
+        lng || null,
         currency || "INR",
         securityQuestion,
         securityAnswer.trim().toLowerCase(),
         verificationStatus,
+        isEmailVerified ? 1 : 0, // email_verified
+        0, // mobile_verified
+        "ACTIVE", // account_status
+        1, // terms_accepted
+        createdAt, // terms_accepted_at
         about || null,
         createdAt
       ]
     );
+
+    // Invalidate consumed registration verification record
+    await consumeVerifiedOtp(cleanEmail, "registration_verification");
 
     const newUser = await query.get("SELECT * FROM users WHERE id = ?", [id]);
 
@@ -309,7 +545,7 @@ app.post("/api/auth/register", async (req, res) => {
     });
   } catch (err) {
     console.error("Registration error:", err);
-    sendError(res, 500, "SERVER_ERROR", "Internal server error during registration.");
+    handleRouteError(res, err, "Internal server error during registration.");
   }
 });
 
@@ -480,7 +716,18 @@ app.put("/api/users/:id", requireAuth, async (req, res) => {
 
   const {
     name,
+    mobile,
     farmName,
+    farmSize,
+    farmingExperience,
+    cropsGrown,
+    primaryCrop,
+    expectedQuantity,
+    businessName,
+    businessType,
+    gstin,
+    procurementCategories,
+    procurementQuantity,
     countryCode,
     countryName,
     region,
@@ -515,11 +762,24 @@ app.put("/api/users/:id", requireAuth, async (req, res) => {
 
     await query.run(
       `UPDATE users 
-       SET name = ?, farmName = ?, countryCode = ?, countryName = ?, region = ?, district = ?, city = ?, postalCode = ?, lat = ?, lng = ?, currency = ?, securityQuestion = ?, securityAnswer = ?, password = ?, about = ?
+       SET name = ?, mobile = ?, farmName = ?, farmSize = ?, farmingExperience = ?, cropsGrown = ?, primaryCrop = ?, expectedQuantity = ?,
+           businessName = ?, businessType = ?, gstin = ?, procurementCategories = ?, procurementQuantity = ?,
+           countryCode = ?, countryName = ?, region = ?, district = ?, city = ?, postalCode = ?, lat = ?, lng = ?, currency = ?, securityQuestion = ?, securityAnswer = ?, password = ?, about = ?
        WHERE id = ?`,
       [
         name !== undefined && name !== null ? safeTrim(name) : user.name,
+        mobile !== undefined ? safeTrim(mobile) : user.mobile,
         farmName !== undefined ? safeTrim(farmName) : user.farmName,
+        farmSize !== undefined ? safeTrim(farmSize) : user.farmSize,
+        farmingExperience !== undefined ? safeTrim(farmingExperience) : user.farmingExperience,
+        cropsGrown !== undefined ? safeTrim(cropsGrown) : user.cropsGrown,
+        primaryCrop !== undefined ? safeTrim(primaryCrop) : user.primaryCrop,
+        expectedQuantity !== undefined ? safeTrim(expectedQuantity) : user.expectedQuantity,
+        businessName !== undefined ? safeTrim(businessName) : user.businessName,
+        businessType !== undefined ? safeTrim(businessType) : user.businessType,
+        gstin !== undefined ? safeTrim(gstin) : user.gstin,
+        procurementCategories !== undefined ? safeTrim(procurementCategories) : user.procurementCategories,
+        procurementQuantity !== undefined ? safeTrim(procurementQuantity) : user.procurementQuantity,
         countryCode !== undefined ? countryCode : user.countryCode,
         countryName !== undefined ? countryName : user.countryName,
         region !== undefined ? safeTrim(region) : user.region,
@@ -559,7 +819,7 @@ app.put("/api/users/:id/verification", requireAuth, requireRole("admin"), async 
     
     const notifId = generateId("n");
     await query.run(
-      "INSERT INTO notifications (id, userId, text, type, read, createdAt) VALUES (?, ?, ?, 'verification', 0, ?)",
+      "INSERT INTO notifications (id, userId, text, type, `read`, createdAt) VALUES (?, ?, ?, 'verification', 0, ?)",
       [notifId, id, `Your account verification status has been updated to ${status}.`, new Date().toISOString()]
     );
 
@@ -572,20 +832,176 @@ app.put("/api/users/:id/verification", requireAuth, requireRole("admin"), async 
 
 // ---------------- PRODUCT ROUTES ----------------
 
-// GET /api/products (Public)
+// Helper to resolve localized product fields with fallback: selected lang -> English -> original
+async function resolveProductTranslations(products, lang = "en") {
+  if (!Array.isArray(products) || products.length === 0) return products;
+
+  const productIds = products.map((p) => p.id);
+  const placeholders = productIds.map(() => "?").join(",");
+  const targetLangs = lang === "en" ? ["en"] : [lang, "en"];
+  const langPlaceholders = targetLangs.map(() => "?").join(",");
+
+  let translations = [];
+  try {
+    translations = await query.all(
+      `SELECT product_id, language_code, name, description 
+       FROM product_translations 
+       WHERE product_id IN (${placeholders}) AND language_code IN (${langPlaceholders})`,
+      [...productIds, ...targetLangs]
+    );
+  } catch (err) {
+    console.warn("Product translations query warning:", err.message);
+  }
+
+  const transMap = new Map();
+  for (const t of (translations || [])) {
+    const key = `${t.product_id}_${t.language_code}`;
+    transMap.set(key, t);
+  }
+
+  return products.map((p) => {
+    const origName = p.name;
+    const origDesc = p.description;
+
+    // Priority fallback: selected language -> English -> original
+    const targetTrans = transMap.get(`${p.id}_${lang}`);
+    const enTrans = transMap.get(`${p.id}_en`);
+    const resolvedTrans = targetTrans || enTrans;
+
+    const translatedName = resolvedTrans?.name || origName;
+    const translatedDesc = resolvedTrans?.description !== undefined && resolvedTrans?.description !== null && resolvedTrans?.description !== ""
+      ? resolvedTrans.description
+      : origDesc;
+
+    return {
+      ...p,
+      originalName: origName,
+      originalDescription: origDesc,
+      name: translatedName,
+      description: translatedDesc,
+      translatedCategory: translateCategory(p.category, lang),
+      translatedUnit: translateUnit(p.unit, lang),
+      translatedGrade: translateGrade(p.grade, lang)
+    };
+  });
+}
+
+// GET /api/products (Public - with ?lang= query param support)
 app.get("/api/products", async (req, res) => {
+  const lang = req.query.lang || req.headers["accept-language"]?.split(",")[0]?.split("-")[0]?.toLowerCase() || "en";
   try {
     const products = await query.all("SELECT * FROM products ORDER BY createdAt DESC");
-    res.json(products);
+    const localized = await resolveProductTranslations(products, lang);
+    res.json(localized);
   } catch (err) {
     console.error("Fetch products error:", err);
     sendError(res, 500, "SERVER_ERROR", "Failed to fetch products.");
   }
 });
 
+// GET /api/products/:id (Public - with ?lang= support)
+app.get("/api/products/:id", async (req, res) => {
+  const { id } = req.params;
+  const lang = req.query.lang || req.headers["accept-language"]?.split(",")[0]?.split("-")[0]?.toLowerCase() || "en";
+  try {
+    const product = await query.get("SELECT * FROM products WHERE id = ?", [id]);
+    if (!product) {
+      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found.");
+    }
+    const [localized] = await resolveProductTranslations([product], lang);
+    res.json(localized);
+  } catch (err) {
+    console.error("Fetch single product error:", err);
+    sendError(res, 500, "SERVER_ERROR", "Failed to fetch product.");
+  }
+});
+
+// GET /api/products/:id/translations (Public or Authenticated)
+app.get("/api/products/:id/translations", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const product = await query.get("SELECT id, name, description FROM products WHERE id = ?", [id]);
+    if (!product) {
+      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found.");
+    }
+    const translations = await query.all(
+      "SELECT id, product_id, language_code, name, description, created_at, updated_at FROM product_translations WHERE product_id = ? ORDER BY language_code ASC",
+      [id]
+    );
+    res.json({
+      productId: id,
+      originalName: product.name,
+      originalDescription: product.description,
+      translations: translations || []
+    });
+  } catch (err) {
+    console.error("Fetch translations error:", err);
+    sendError(res, 500, "SERVER_ERROR", "Failed to fetch product translations.");
+  }
+});
+
+// POST /api/products/:id/translations (Farmer owner or Admin Only)
+app.post("/api/products/:id/translations", requireAuth, requireRole("farmer", "admin"), async (req, res) => {
+  const { id } = req.params;
+  const { language_code, name, description } = req.body || {};
+
+  if (!language_code || !name) {
+    return sendError(res, 400, "INVALID_INPUT", "language_code and translated name are required.");
+  }
+
+  try {
+    const product = await query.get("SELECT * FROM products WHERE id = ?", [id]);
+    if (!product) {
+      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found.");
+    }
+
+    if (product.farmerId !== req.user.id && req.user.role !== "admin") {
+      return sendError(res, 403, "FORBIDDEN", "You are not authorized to modify translations for this product.");
+    }
+
+    const langCode = String(language_code).trim().toLowerCase();
+    const transId = `pt_${id}_${langCode}`;
+    const nowIso = new Date().toISOString();
+
+    await query.run(
+      `INSERT INTO product_translations (id, product_id, language_code, name, description, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description), updated_at = VALUES(updated_at)`,
+      [transId, id, langCode, name.trim(), description || "", nowIso, nowIso]
+    );
+
+    const saved = await query.get("SELECT * FROM product_translations WHERE id = ?", [transId]);
+    res.status(200).json({ success: true, translation: saved });
+  } catch (err) {
+    console.error("Save product translation error:", err);
+    sendError(res, 500, "SERVER_ERROR", "Failed to save product translation.");
+  }
+});
+
+// DELETE /api/products/:id/translations/:lang (Farmer owner or Admin Only)
+app.delete("/api/products/:id/translations/:lang", requireAuth, requireRole("farmer", "admin"), async (req, res) => {
+  const { id, lang } = req.params;
+  try {
+    const product = await query.get("SELECT * FROM products WHERE id = ?", [id]);
+    if (!product) {
+      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found.");
+    }
+
+    if (product.farmerId !== req.user.id && req.user.role !== "admin") {
+      return sendError(res, 403, "FORBIDDEN", "You are not authorized to delete translations for this product.");
+    }
+
+    await query.run("DELETE FROM product_translations WHERE product_id = ? AND language_code = ?", [id, lang.toLowerCase()]);
+    res.json({ success: true, message: `Translation for language '${lang}' deleted successfully.` });
+  } catch (err) {
+    console.error("Delete product translation error:", err);
+    sendError(res, 500, "SERVER_ERROR", "Failed to delete product translation.");
+  }
+});
+
 // POST /api/products (Farmer or Admin Only)
 app.post("/api/products", requireAuth, requireRole("farmer", "admin"), async (req, res) => {
-  const { name, category, grade, price, currency, unit, stock, description, imageUrl, moq, tierPrices, organic, harvestDate } = req.body || {};
+  const { name, category, grade, price, currency, unit, stock, description, imageUrl, moq, tierPrices, organic, harvestDate, value_added_product_id } = req.body || {};
 
   if (!name || !category || price === undefined || !unit || stock === undefined) {
     return sendError(res, 400, "INVALID_INPUT", "Required fields: name, category, price, unit, stock.");
@@ -607,8 +1023,8 @@ app.post("/api/products", requireAuth, requireRole("farmer", "admin"), async (re
     const farmer = await query.get("SELECT countryCode, region, district, city, lat, lng, currency FROM users WHERE id = ?", [farmerId]);
 
     await query.run(
-      `INSERT INTO products (id, name, category, grade, price, currency, unit, stock, farmerId, countryCode, region, district, city, lat, lng, description, imageUrl, moq, tierPrices, organic, harvestDate, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (id, name, category, grade, price, currency, unit, stock, farmerId, countryCode, region, district, city, lat, lng, description, imageUrl, moq, tierPrices, organic, harvestDate, value_added_product_id, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         name.trim(),
@@ -631,6 +1047,7 @@ app.post("/api/products", requireAuth, requireRole("farmer", "admin"), async (re
         tierPrices || "{}",
         organic ? 1 : 0,
         harvestDate || null,
+        value_added_product_id || null,
         createdAt
       ]
     );
@@ -657,11 +1074,11 @@ app.put("/api/products/:id", requireAuth, requireRole("farmer", "admin"), async 
       return sendError(res, 403, "FORBIDDEN", "You are not authorized to edit this product.");
     }
 
-    const { name, category, grade, price, currency, unit, stock, countryCode, region, district, city, lat, lng, description, imageUrl, moq, tierPrices, organic, harvestDate } = req.body;
+    const { name, category, grade, price, currency, unit, stock, countryCode, region, district, city, lat, lng, description, imageUrl, moq, tierPrices, organic, harvestDate, value_added_product_id } = req.body;
 
     await query.run(
       `UPDATE products 
-       SET name = ?, category = ?, grade = ?, price = ?, currency = ?, unit = ?, stock = ?, countryCode = ?, region = ?, district = ?, city = ?, lat = ?, lng = ?, description = ?, imageUrl = ?, moq = ?, tierPrices = ?, organic = ?, harvestDate = ?
+       SET name = ?, category = ?, grade = ?, price = ?, currency = ?, unit = ?, stock = ?, countryCode = ?, region = ?, district = ?, city = ?, lat = ?, lng = ?, description = ?, imageUrl = ?, moq = ?, tierPrices = ?, organic = ?, harvestDate = ?, value_added_product_id = ?
        WHERE id = ?`,
       [
         name !== undefined ? name : product.name,
@@ -683,6 +1100,7 @@ app.put("/api/products/:id", requireAuth, requireRole("farmer", "admin"), async 
         tierPrices !== undefined ? tierPrices : product.tierPrices,
         organic !== undefined ? (organic ? 1 : 0) : product.organic,
         harvestDate !== undefined ? harvestDate : product.harvestDate,
+        value_added_product_id !== undefined ? value_added_product_id : product.value_added_product_id,
         id
       ]
     );
@@ -894,14 +1312,15 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
   const grandTotal = subtotal + deliveryCharge;
   const initialPaymentStatus = paymentMethod === "cod" ? "COD" : "PENDING_PAYMENT";
 
-  // Step 2: Atomic SQLite Transaction Execution
+  // Step 2: Atomic MySQL Transaction Execution
+  let conn = null;
   try {
-    await query.beginTransaction();
+    conn = await query.beginTransaction();
 
     // 1. Insert Group Order
     await query.run(
-      `INSERT INTO orders (id, vendorId, vendorName, deliveryCountry, deliveryRegion, deliveryDistrict, deliveryCity, deliveryPostalCode, deliveryAddress, paymentMethod, totalAmount, subtotal, deliveryCharge, deliveryDistanceKm, deliveryEtaMinutes, paymentStatus, currency, status, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?)`,
+      `INSERT INTO orders (id, vendorId, vendorName, deliveryCountry, deliveryRegion, deliveryDistrict, deliveryCity, deliveryPostalCode, deliveryAddress, deliveryLat, deliveryLng, paymentMethod, totalAmount, subtotal, deliveryCharge, deliveryDistanceKm, deliveryEtaMinutes, paymentStatus, currency, status, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Order Placed', ?)`,
       [
         orderId,
         vendorId,
@@ -912,6 +1331,8 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
         deliveryCity || null,
         deliveryPostalCode || null,
         deliveryAddress || null,
+        destLat,
+        destLng,
         paymentMethod || "cod",
         grandTotal,
         subtotal,
@@ -921,7 +1342,27 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
         initialPaymentStatus,
         currency || "INR",
         createdAt
-      ]
+      ],
+      conn
+    );
+
+    // 1b. Seed initial 'Order Placed' tracking event
+    const initTrackingId = generateId("trk");
+    await query.run(
+      `INSERT INTO order_tracking_events (id, order_id, status, location, latitude, longitude, description, timestamp, updated_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        initTrackingId,
+        orderId,
+        "Order Placed",
+        deliveryCity || deliveryDistrict || deliveryRegion || "Order Received",
+        destLat,
+        destLng,
+        `Order confirmed and placed by buyer for delivery to ${deliveryAddress || deliveryCity || "destination"}.`,
+        createdAt,
+        vendorId
+      ],
+      conn
     );
 
     // 2. Insert Order Items and Update Product Inventory
@@ -933,13 +1374,15 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
       await query.run(
         `INSERT INTO order_items (id, orderId, productId, farmerId, qty, unitPrice, amount)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [itemId, orderId, vItem.product.id, vItem.farmerId, vItem.qty, vItem.unitPrice, vItem.itemAmount]
+        [itemId, orderId, vItem.product.id, vItem.farmerId, vItem.qty, vItem.unitPrice, vItem.itemAmount],
+        conn
       );
 
       // Atomic Inventory Reduction (Problem 5: Strict atomic condition)
       const stockResult = await query.run(
         "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?",
-        [vItem.qty, vItem.product.id, vItem.qty]
+        [vItem.qty, vItem.product.id, vItem.qty],
+        conn
       );
 
       if (stockResult.changes !== 1) {
@@ -952,15 +1395,17 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
         const notifId = generateId("n");
         const notifText = `New B2B Order ${orderId} received for ${vItem.qty} ${vItem.product.unit} of ${vItem.product.name} from ${vendorName}`;
         await query.run(
-          `INSERT INTO notifications (id, userId, text, type, read, createdAt)
+          `INSERT INTO notifications (id, userId, text, type, \`read\`, createdAt)
            VALUES (?, ?, ?, 'order', 0, ?)`,
-          [notifId, vItem.farmerId, notifText, createdAt]
+          [notifId, vItem.farmerId, notifText, createdAt],
+          conn
         );
       }
     }
 
     // All operations succeeded -> COMMIT
-    await query.commit();
+    await query.commit(conn);
+    conn = null;
 
     // Broadcast real-time events to farmers
     for (const vItem of validatedItems) {
@@ -996,10 +1441,12 @@ app.post("/api/orders", requireAuth, requireRole("vendor", "admin"), async (req,
     res.status(201).json(createdJoined);
   } catch (err) {
     // Rollback transaction on ANY failure to maintain database integrity
-    try {
-      await query.rollback();
-    } catch {
-      /* ignore rollback error if already inactive */
+    if (conn) {
+      try {
+        await query.rollback(conn);
+      } catch {
+        /* ignore rollback error if already inactive */
+      }
     }
 
     if (err.message && err.message.startsWith("STOCK_CONFLICT:")) {
@@ -1017,8 +1464,24 @@ app.put("/api/orders/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body || {};
 
-  if (!status) {
-    return sendError(res, 400, "INVALID_INPUT", "Status is required.");
+  const VALID_ORDER_STATUSES = [
+    "Order Placed",
+    "Order Confirmed",
+    "Confirmed",
+    "Pending",
+    "Processing",
+    "Packed",
+    "Dispatched",
+    "Shipped",
+    "In Transit",
+    "Reached Destination Hub",
+    "Out for Delivery",
+    "Delivered",
+    "Cancelled"
+  ];
+
+  if (!status || !VALID_ORDER_STATUSES.includes(status)) {
+    return sendError(res, 400, "INVALID_INPUT", `Valid status is required. Allowed: ${VALID_ORDER_STATUSES.join(", ")}`);
   }
 
   try {
@@ -1040,12 +1503,24 @@ app.put("/api/orders/:id", requireAuth, async (req, res) => {
 
     await query.run("UPDATE orders SET status = ? WHERE id = ?", [status, id]);
 
+    // Record tracking event in order_tracking_events
+    const trkId = generateId("trk");
+    const trkLocation = req.body.location || order.deliveryCity || order.deliveryDistrict || order.deliveryRegion || "Transit Checkpoint";
+    const trkLat = req.body.latitude !== undefined && req.body.latitude !== null ? parseFloat(req.body.latitude) : order.deliveryLat;
+    const trkLng = req.body.longitude !== undefined && req.body.longitude !== null ? parseFloat(req.body.longitude) : order.deliveryLng;
+    const trkDesc = req.body.description || `Order status updated to ${status}.`;
+    await query.run(
+      `INSERT INTO order_tracking_events (id, order_id, status, location, latitude, longitude, description, timestamp, updated_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [trkId, id, status, trkLocation, trkLat, trkLng, trkDesc, new Date().toISOString(), req.user.id]
+    );
+
     // Create notification and broadcast real-time event for vendor
     if (order.vendorId) {
       const notifId = generateId("n");
       const notifText = `Order ${id} status updated to ${status}`;
       await query.run(
-        `INSERT INTO notifications (id, userId, text, type, read, createdAt)
+        `INSERT INTO notifications (id, userId, text, type, \`read\`, createdAt)
          VALUES (?, ?, ?, 'order', 0, ?)`,
         [notifId, order.vendorId, notifText, new Date().toISOString()]
       );
@@ -1122,12 +1597,16 @@ app.post("/api/notifications", requireAuth, async (req, res) => {
     return sendError(res, 400, "INVALID_INPUT", "userId and notification text are required.");
   }
 
+  if (req.user.role !== "admin" && userId !== req.user.id) {
+    return sendError(res, 403, "FORBIDDEN", "You can only create notifications for yourself.");
+  }
+
   const id = generateId("n");
   const createdAt = new Date().toISOString();
 
   try {
     await query.run(
-      `INSERT INTO notifications (id, userId, text, type, read, createdAt)
+      `INSERT INTO notifications (id, userId, text, type, \`read\`, createdAt)
        VALUES (?, ?, ?, ?, 0, ?)`,
       [id, userId, text, type || "system", createdAt]
     );
@@ -1144,7 +1623,7 @@ app.post("/api/notifications", requireAuth, async (req, res) => {
 // PUT /api/notifications/read-all
 app.put("/api/notifications/read-all", requireAuth, async (req, res) => {
   try {
-    await query.run("UPDATE notifications SET read = 1 WHERE userId = ?", [req.user.id]);
+    await query.run("UPDATE notifications SET `read` = 1 WHERE userId = ?", [req.user.id]);
     res.json({ success: true, message: "All notifications marked as read." });
   } catch (err) {
     console.error("Read all notifications error:", err);
@@ -1157,7 +1636,7 @@ app.put("/api/notifications/:id/read", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    await query.run("UPDATE notifications SET read = 1 WHERE id = ? AND userId = ?", [id, req.user.id]);
+    await query.run("UPDATE notifications SET `read` = 1 WHERE id = ? AND userId = ?", [id, req.user.id]);
     res.json({ success: true, message: "Notification marked as read.", id });
   } catch (err) {
     console.error("Read notification error:", err);
@@ -1223,8 +1702,8 @@ app.post("/api/reviews", requireAuth, requireRole("vendor", "admin"), async (req
     );
 
     const average = await query.get("SELECT AVG(rating) as avgRating FROM reviews WHERE farmerId = ? AND status = 'Approved'", [farmerId]);
-    if (average && average.avgRating) {
-      await query.run("UPDATE users SET rating = ? WHERE id = ?", [parseFloat(average.avgRating.toFixed(1)), farmerId]);
+    if (average && average.avgRating !== null && average.avgRating !== undefined) {
+      await query.run("UPDATE users SET rating = ? WHERE id = ?", [parseFloat(parseFloat(average.avgRating).toFixed(1)), farmerId]);
     }
 
     const newReview = await query.get("SELECT * FROM reviews WHERE id = ?", [id]);
@@ -1426,7 +1905,78 @@ app.post("/api/translate", async (req, res) => {
   res.json({ translations: results });
 });
 
-// Start Express Server
-app.listen(PORT, () => {
-  console.log(`FarmConnect Secure Backend listening at http://localhost:${PORT}`);
+// Centralized Error Handling Middleware (Prevents HTML stack trace leaks)
+app.use((err, req, res, next) => {
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({
+      success: false,
+      error: { code: "INVALID_JSON", message: "Malformed JSON request body." }
+    });
+  }
+  if (err.message === "Not allowed by CORS") {
+    return res.status(403).json({
+      success: false,
+      error: { code: "CORS_FORBIDDEN", message: "Origin not allowed by CORS." }
+    });
+  }
+  console.error("[Server Error]:", err);
+  const isProd = process.env.NODE_ENV === "production";
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      code: err.code || "SERVER_ERROR",
+      message: isProd ? "An internal server error occurred." : (err.message || "An internal server error occurred.")
+    }
+  });
 });
+
+// Start Express Server
+const server = app.listen(PORT, "0.0.0.0", async () => {
+  console.log(`FarmConnect Secure Backend listening at http://localhost:${PORT} (0.0.0.0:${PORT})`);
+
+  // Phase 12 Startup Diagnostics Banner
+  try {
+    const diag = await getAiDiagnostics();
+    console.log("\n========================================================");
+    console.log("🌾 FarmConnect AI System Startup Diagnostics");
+    console.log(`• AI Engine Status : [${diag.aiEngine}]`);
+    console.log(`• NLP Engine Status: [${diag.nlpEngine || diag.aiEngine}]`);
+    console.log(`• Model            : ${diag.aiModel || "local-python-nlp"}`);
+    console.log(`• Latency          : ${diag.aiLatencyMs || 0}ms`);
+    console.log(`• STT / TTS        : ${diag.sttProvider} / ${diag.ttsProvider}`);
+    console.log(`• Retry Attempts   : ${diag.retryAttempts}`);
+    console.log(`• Fallback         : ${diag.fallback}`);
+    console.log(`• Details          : ${diag.diagnosticsDetails}`);
+    console.log("========================================================\n");
+  } catch (err) {
+    console.warn("⚠️ AI startup diagnostics notice:", err.message);
+  }
+
+  // Safe non-blocking SMTP connection verification test
+  verifySmtpConnection().catch((smtpErr) => {
+    console.warn("[Email Service] Startup SMTP verification notice:", smtpErr.message);
+  });
+});
+
+// Graceful Shutdown Handler (prevents libuv assertions & socket leaks)
+async function gracefulShutdown(signal) {
+  console.log(`\n[Server] Received ${signal}. Starting graceful shutdown...`);
+  server.close(async () => {
+    console.log("[Server] HTTP server closed.");
+    try {
+      if (pool && typeof pool.end === "function") {
+        await pool.end();
+        console.log("[Server] Database connection pool closed.");
+      }
+    } catch (dbErr) {
+      console.warn("[Server] Error closing database pool:", dbErr.message);
+    }
+    setTimeout(() => {
+      console.log("[Server] Graceful shutdown complete.");
+      process.exit(0);
+    }, 100);
+  });
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));

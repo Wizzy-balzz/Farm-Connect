@@ -8,14 +8,20 @@
     "backend": "npm install --prefix backend && npm start --prefix backend",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:backup": "node scripts/backup-mysql.js",
+    "db:restore": "node scripts/restore-mysql.js",
+    "db:verify-backup": "node scripts/verify-backup.js"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "i18next": "^26.3.6",
+    "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.11",
-    "react-router-dom": "^6.22.3"
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

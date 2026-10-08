@@ -23,6 +23,7 @@ import { formatCurrency, formatDate } from "../../utils/formatters.js";
 import { useData } from "../../hooks/useData.js";
 import { useCart } from "../../hooks/useCart.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
+import { getCategoryLabel, getUnitLabel, getGradeLabel, getSystemTerm } from "../../utils/controlledVocabulary.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
 import { useAuth } from "../../hooks/useAuth.js";
 
@@ -50,11 +51,11 @@ const CATEGORY_GALLERIES = {
 function ProductDetailsBase() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user: currentUser } = useAuth();
   const { products } = useData();
   const { wishlist, addToCart, toggleWishlist } = useCart();
-  const { notifySuccess } = useNotifications();
+  const { notifySuccess, notifyError } = useNotifications();
 
   const [loading, setLoading] = useState(true);
   const [farmers, setFarmers] = useState([]);
@@ -212,8 +213,9 @@ function ProductDetailsBase() {
       if (data && data.conversation) {
         navigate(`/chat/${data.conversation.id}`);
       }
-    } catch {
-      console.error("Failed to open chat");
+    } catch (err) {
+      console.error("Failed to open chat", err);
+      notifyError(err.message || "Failed to start conversation with farmer.");
     }
   };
 
@@ -299,7 +301,7 @@ function ProductDetailsBase() {
             Marketplace
           </Link>
           <span>/</span>
-          <span>{product.category}</span>
+          <span>{product.translatedCategory || getCategoryLabel(product.category, lang)}</span>
           <span>/</span>
           <strong style={{ color: "var(--text)" }}>{product.name}</strong>
         </div>
@@ -351,11 +353,11 @@ function ProductDetailsBase() {
               {product.organic === 1 && <Badge variant="organic" />}
               {isFresh && (
                 <span className="fc-status-badge" style={{ background: "var(--info)", color: "#fff", fontSize: 10, fontWeight: 700 }}>
-                  ⏱️ FRESH HARVEST
+                  ⏱️ {getSystemTerm("freshHarvest", lang).toUpperCase()}
                 </span>
               )}
               <span className="fc-status-badge" style={{ background: "var(--surface)", color: "var(--text)", fontSize: 10, fontWeight: 700 }}>
-                Grade {product.grade}
+                {product.translatedGrade || getGradeLabel(product.grade, lang)}
               </span>
             </div>
           </div>
@@ -428,7 +430,7 @@ function ProductDetailsBase() {
                 {formatCurrency(product.price)}
               </strong>
               <span className="fc-soft" style={{ fontSize: "14px" }}>
-                /{product.unit}
+                /{product.translatedUnit || getUnitLabel(product.unit, lang)}
               </span>
             </div>
           </div>
@@ -436,12 +438,12 @@ function ProductDetailsBase() {
           {/* Stock & MOQ Info Badges */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20, background: "var(--bg-soft)", padding: "12px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)" }}>
             <div>
-              <span className="fc-soft" style={{ fontSize: 11, display: "block" }}>AVAILABLE STOCK</span>
-              <strong style={{ fontSize: 13.5 }}>{product.stock} {product.unit}</strong>
+              <span className="fc-soft" style={{ fontSize: 11, display: "block" }}>{getSystemTerm("stock", lang).toUpperCase()}</span>
+              <strong style={{ fontSize: 13.5 }}>{product.stock} {product.translatedUnit || getUnitLabel(product.unit, lang)}</strong>
             </div>
             <div>
-              <span className="fc-soft" style={{ fontSize: 11, display: "block" }}>MINIMUM ORDER (MOQ)</span>
-              <strong style={{ fontSize: 13.5 }}>{product.moq || 10} {product.unit}</strong>
+              <span className="fc-soft" style={{ fontSize: 11, display: "block" }}>{getSystemTerm("moq", lang).toUpperCase()}</span>
+              <strong style={{ fontSize: 13.5 }}>{product.moq || 10} {product.translatedUnit || getUnitLabel(product.unit, lang)}</strong>
             </div>
           </div>
 
@@ -555,11 +557,11 @@ function ProductDetailsBase() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "13px" }}>
               <div style={{ background: "var(--bg-soft)", padding: "10px 14px", borderRadius: "var(--radius-sm)" }}>
                 <span className="fc-soft" style={{ display: "block", fontSize: 11 }}>PRODUCE CATEGORY</span>
-                <strong>{product.category}</strong>
+                <strong>{product.translatedCategory || getCategoryLabel(product.category, lang)}</strong>
               </div>
               <div style={{ background: "var(--bg-soft)", padding: "10px 14px", borderRadius: "var(--radius-sm)" }}>
                 <span className="fc-soft" style={{ display: "block", fontSize: 11 }}>QUALITY GRADE</span>
-                <strong>Grade {product.grade}</strong>
+                <strong>{product.translatedGrade || getGradeLabel(product.grade, lang)}</strong>
               </div>
               <div style={{ background: "var(--bg-soft)", padding: "10px 14px", borderRadius: "var(--radius-sm)" }}>
                 <span className="fc-soft" style={{ display: "block", fontSize: 11 }}>HARVEST DATE</span>

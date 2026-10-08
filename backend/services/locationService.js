@@ -347,40 +347,64 @@ export async function getCountries() {
   if (cache.countries) return cache.countries;
 
   try {
-    const res = await fetch("https://restcountries.com/v3.1/all?fields=name,cca2,cca3,region,subregion,currencies,idd,latlng,timezones,flag");
-    if (res.ok) {
-      const data = await res.json();
+    const res = await fetch(
+      "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,region,subregion,currencies,idd,latlng,timezones,flag",
+      { signal: AbortSignal.timeout(5000) }
+    );
+
+    if (res.ok && res.status >= 200 && res.status < 300) {
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        console.warn("[LocationService] RestCountries API returned non-JSON response:", jsonErr.message);
+        cache.countries = FALLBACK_COUNTRIES;
+        return FALLBACK_COUNTRIES;
+      }
+
+      if (!Array.isArray(data)) {
+        const preview = typeof data === "object" && data !== null ? JSON.stringify(data).slice(0, 160) : String(data);
+        console.warn(`[LocationService] RestCountries API returned non-array payload (${preview}). Using comprehensive fallback countries.`);
+        cache.countries = FALLBACK_COUNTRIES;
+        return FALLBACK_COUNTRIES;
+      }
+
       const mapped = data.map((c) => {
-        const currCode = c.currencies ? Object.keys(c.currencies)[0] : "USD";
-        const currObj = c.currencies ? c.currencies[currCode] : {};
-        const callCode = c.idd && c.idd.root ? `${c.idd.root}${c.idd.suffixes ? c.idd.suffixes[0] : ""}` : "";
+        if (!c || typeof c !== "object") return null;
+        const currCode = c.currencies && typeof c.currencies === "object" ? Object.keys(c.currencies)[0] : "USD";
+        const currObj = (c.currencies && currCode) ? c.currencies[currCode] || {} : {};
+        const callCode = c.idd && c.idd.root ? `${c.idd.root}${c.idd.suffixes && Array.isArray(c.idd.suffixes) ? c.idd.suffixes[0] : ""}` : "";
         
         const fb = FALLBACK_COUNTRIES.find((f) => f.code === c.cca2) || {};
 
         return {
-          code: c.cca2,
-          code3: c.cca3,
-          name: c.name.common || c.name.official,
-          flag: c.flag || fb.flag || "🌐",
-          region: c.region,
-          subregion: c.subregion,
-          currency: currCode,
+          code: c.cca2 || fb.code,
+          code3: c.cca3 || fb.code3,
+          name: (c.name && (c.name.common || c.name.official)) || fb.name || "Unknown",
+          flag: c.flag || (c.flags && (c.flags.emoji || c.flags.png)) || fb.flag || "🌐",
+          region: c.region || fb.region || "Global",
+          subregion: c.subregion || fb.subregion || "",
+          currency: currCode || fb.currency || "USD",
           symbol: currObj.symbol || fb.symbol || "$",
           callingCode: callCode || fb.callingCode || "",
-          timezone: c.timezones && c.timezones.length ? c.timezones[0] : (fb.timezone || "UTC"),
-          lat: c.latlng && c.latlng.length >= 2 ? c.latlng[0] : (fb.lat || 0),
-          lng: c.latlng && c.latlng.length >= 2 ? c.latlng[1] : (fb.lng || 0),
+          timezone: c.timezones && Array.isArray(c.timezones) && c.timezones.length ? c.timezones[0] : (fb.timezone || "UTC"),
+          lat: c.latlng && Array.isArray(c.latlng) && c.latlng.length >= 2 ? c.latlng[0] : (fb.lat || 0),
+          lng: c.latlng && Array.isArray(c.latlng) && c.latlng.length >= 2 ? c.latlng[1] : (fb.lng || 0),
           adminTerm: fb.adminTerm || "State / Region",
           districtTerm: fb.districtTerm || "District / County"
         };
-      });
+      }).filter(Boolean);
 
-      mapped.sort((a, b) => a.name.localeCompare(b.name));
-      cache.countries = mapped;
-      return mapped;
+      if (mapped.length > 0) {
+        mapped.sort((a, b) => a.name.localeCompare(b.name));
+        cache.countries = mapped;
+        return mapped;
+      }
+    } else {
+      console.warn(`[LocationService] RestCountries API request failed with HTTP ${res.status} (${res.statusText}). Using comprehensive fallback countries.`);
     }
   } catch (err) {
-    console.warn("RestCountries API request failed, using comprehensive fallback countries:", err.message);
+    console.warn("[LocationService] RestCountries API network or parse error, using comprehensive fallback countries:", err.message);
   }
 
   cache.countries = FALLBACK_COUNTRIES;
@@ -533,49 +557,151 @@ export async function getPlaces(rawCountryCode, rawRegionCode, rawDistrictCode) 
   return fallback;
 }
 
-/**
- * Search global locations via Mapbox Geocoding or fallback fuzzy search
- */
-export async function searchLocations(query, rawCountryCode) {
-  const cCode = rawCountryCode ? normalizeCountryCode(rawCountryCode) : "";
-  const token = process.env.VITE_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN;
+// Rate limiter for OpenStreetMap Nominatim (strictly respecting 1 request per second policy)
+let lastNominatimRequestTime = 0;
+async function rateLimitedNominatimFetch(url) {
+  const now = Date.now();
+  const timeSinceLast = now - lastNominatimRequestTime;
+  const minInterval = 1050; // 1.05s buffer to strictly satisfy 1 req/sec limit
+  if (timeSinceLast < minInterval) {
+    await new Promise((resolve) => setTimeout(resolve, minInterval - timeSinceLast));
+  }
+  lastNominatimRequestTime = Date.now();
 
-  if (token && query && query.trim().length >= 2) {
-    try {
-      const countryParam = cCode ? `&country=${cCode}` : "";
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&types=place,locality,neighborhood,address,district,region${countryParam}&limit=6`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.features) {
-          return data.features.map((f) => {
-            const context = f.context || [];
-            const countryCtx = context.find((c) => c.id.startsWith("country"));
-            const regionCtx = context.find((c) => c.id.startsWith("region"));
-            const districtCtx = context.find((c) => c.id.startsWith("district"));
-            
-            return {
-              id: f.id,
-              placeName: f.text || f.place_name,
-              formattedAddress: f.place_name,
-              latitude: f.center ? f.center[1] : 0,
-              longitude: f.center ? f.center[0] : 0,
-              countryCode: countryCtx ? (countryCtx.short_code || "").toUpperCase() : (cCode || "IN"),
-              countryName: countryCtx ? countryCtx.text : "India",
-              regionName: regionCtx ? regionCtx.text : "",
-              districtName: districtCtx ? districtCtx.text : ""
-            };
-          });
-        }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "FarmConnect-AgriPlatform/2.0 (contact@farmconnect.in; B2B Agricultural Produce System)",
+        "Accept": "application/json"
       }
-    } catch (err) {
-      console.warn("Mapbox geocoding error:", err.message);
+    });
+    clearTimeout(timeoutId);
+    return res;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+// In-memory Nominatim cache with 24-hour TTL
+const nominatimSearchCache = new Map();
+const nominatimReverseCache = new Map();
+const NOMINATIM_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+function getCached(cacheMap, key) {
+  const item = cacheMap.get(key);
+  if (!item) return null;
+  if (Date.now() - item.cachedAt > NOMINATIM_CACHE_TTL) {
+    cacheMap.delete(key);
+    return null;
+  }
+  return item.data;
+}
+
+function setCached(cacheMap, key, data) {
+  if (cacheMap.size > 2000) {
+    const firstKey = cacheMap.keys().next().value;
+    cacheMap.delete(firstKey);
+  }
+  cacheMap.set(key, { data, cachedAt: Date.now() });
+}
+
+/**
+ * Normalize Nominatim address component into FarmConnect standard object:
+ * { latitude, longitude, address, city, district, state, pincode, country }
+ */
+function normalizeNominatimResult(item) {
+  const lat = parseFloat(item.lat);
+  const lon = parseFloat(item.lon);
+  const addr = item.address || {};
+
+  const city =
+    addr.city ||
+    addr.town ||
+    addr.village ||
+    addr.municipality ||
+    addr.suburb ||
+    addr.county ||
+    item.name ||
+    "";
+
+  const district =
+    addr.state_district ||
+    addr.district ||
+    addr.county ||
+    addr.subdistrict ||
+    city ||
+    "";
+
+  const state = addr.state || addr.region || addr.province || "";
+  const country = addr.country || "India";
+  const countryCode = (addr.country_code || "in").toUpperCase();
+  const pincode = addr.postcode || "";
+
+  // Build clean display street / building address
+  const streetParts = [
+    addr.road || addr.street,
+    addr.neighbourhood || addr.suburb,
+    addr.hamlet
+  ].filter(Boolean);
+  const streetAddress = streetParts.length > 0 ? streetParts.join(", ") : (item.name || city);
+
+  return {
+    id: String(item.place_id || `${lat}_${lon}`),
+    latitude: lat,
+    longitude: lon,
+    address: streetAddress,
+    city: city,
+    district: district,
+    state: state,
+    region: state, // Backward-compatibility alias for FarmConnect region
+    pincode: pincode,
+    postalCode: pincode, // Alias
+    country: country,
+    countryCode: countryCode,
+    countryName: country,
+    placeName: city || item.name || "Selected Location",
+    formattedAddress: item.display_name || `${city}, ${state}, ${country}`
+  };
+}
+
+/**
+ * Search global & All-India locations via OpenStreetMap Nominatim
+ */
+export async function searchLocations(query, rawCountryCode = "IN") {
+  const q = (query || "").trim();
+  if (q.length < 2) return [];
+
+  const cCode = rawCountryCode ? normalizeCountryCode(rawCountryCode).toLowerCase() : "";
+  const cacheKey = `${cCode}:${q.toLowerCase()}`;
+  const cached = getCached(nominatimSearchCache, cacheKey);
+  if (cached) return cached;
+
+  // 1. Query OpenStreetMap Nominatim API
+  try {
+    const countryFilter = cCode ? `&countrycodes=${encodeURIComponent(cCode)}` : "";
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6${countryFilter}`;
+    const res = await rateLimitedNominatimFetch(url);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const results = data.map(normalizeNominatimResult);
+        setCached(nominatimSearchCache, cacheKey, results);
+        return results;
+      }
     }
+  } catch (err) {
+    console.warn("OpenStreetMap Nominatim search error, utilizing resilient local lookup:", err.message);
   }
 
-  // Local search fallback across fallback places
-  const q = (query || "").toLowerCase();
-  const results = [];
+  // 2. Resilient local fallback across ALL registered regions and districts (All-India & Global)
+  const qLower = q.toLowerCase();
+  const fallbackResults = [];
 
   for (const [key, placeList] of Object.entries(FALLBACK_PLACES)) {
     const parts = key.split("-"); // [cCode, rCode, dCode]
@@ -584,70 +710,122 @@ export async function searchLocations(query, rawCountryCode) {
     const dObj = (FALLBACK_DISTRICTS[`${parts[0]}-${parts[1]}`] || []).find((d) => d.code === parts[2]);
 
     for (const p of placeList) {
-      if (p.name.toLowerCase().includes(q) || (dObj && dObj.name.toLowerCase().includes(q)) || (rObj && rObj.name.toLowerCase().includes(q))) {
-        results.push({
+      if (
+        p.name.toLowerCase().includes(qLower) ||
+        (dObj && dObj.name.toLowerCase().includes(qLower)) ||
+        (rObj && rObj.name.toLowerCase().includes(qLower))
+      ) {
+        fallbackResults.push({
           id: p.code,
-          placeName: p.name,
-          formattedAddress: `${p.name}, ${dObj ? dObj.name + ", " : ""}${rObj ? rObj.name + ", " : ""}${cObj.name}`,
           latitude: p.lat,
           longitude: p.lng,
+          address: p.name,
+          city: p.name,
+          district: dObj ? dObj.name : "",
+          state: rObj ? rObj.name : "",
+          region: rObj ? rObj.name : "",
+          pincode: "",
+          postalCode: "",
+          country: cObj.name,
           countryCode: cObj.code,
           countryName: cObj.name,
-          regionName: rObj ? rObj.name : "",
-          districtName: dObj ? dObj.name : ""
+          placeName: p.name,
+          formattedAddress: `${p.name}, ${dObj ? dObj.name + ", " : ""}${rObj ? rObj.name + ", " : ""}${cObj.name}`
         });
       }
     }
   }
 
-  return results.slice(0, 6);
-}
-
-/**
- * Reverse geocode latitude and longitude to location hierarchy
- */
-export async function reverseGeocode(lat, lng) {
-  const token = process.env.VITE_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN;
-
-  if (token && lat && lng) {
-    try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&types=place,district,region,country&limit=1`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.features && data.features.length > 0) {
-          const f = data.features[0];
-          const context = f.context || [];
-          const countryCtx = context.find((c) => c.id.startsWith("country"));
-          const regionCtx = context.find((c) => c.id.startsWith("region"));
-          const districtCtx = context.find((c) => c.id.startsWith("district"));
-
-          return {
-            placeName: f.text || "Detected Location",
-            formattedAddress: f.place_name,
-            countryCode: countryCtx ? (countryCtx.short_code || "").toUpperCase() : "IN",
-            countryName: countryCtx ? countryCtx.text : "India",
-            regionName: regionCtx ? regionCtx.text : "Tamil Nadu",
-            districtName: districtCtx ? districtCtx.text : "Thoothukudi",
-            latitude: lat,
-            longitude: lng
-          };
+  // Also check region/state and district names directly for All-India coverage
+  if (fallbackResults.length === 0) {
+    for (const [cKey, rList] of Object.entries(FALLBACK_REGIONS)) {
+      const cObj = FALLBACK_COUNTRIES.find((c) => c.code === cKey) || { name: "India", code: "IN" };
+      for (const r of rList) {
+        if (r.name.toLowerCase().includes(qLower)) {
+          fallbackResults.push({
+            id: `reg-${r.code}`,
+            latitude: 20.5937,
+            longitude: 78.9629,
+            address: r.name,
+            city: r.name,
+            district: "",
+            state: r.name,
+            region: r.name,
+            pincode: "",
+            postalCode: "",
+            country: cObj.name,
+            countryCode: cObj.code,
+            countryName: cObj.name,
+            placeName: r.name,
+            formattedAddress: `${r.name}, ${cObj.name}`
+          });
         }
       }
-    } catch (err) {
-      console.warn("Mapbox reverse geocoding error:", err.message);
     }
   }
 
-  // Fallback default reverse geocoding result
-  return {
-    placeName: "Kovilpatti",
-    formattedAddress: "Kovilpatti, Thoothukudi, Tamil Nadu, India",
+  const sliced = fallbackResults.slice(0, 6);
+  if (sliced.length > 0) {
+    setCached(nominatimSearchCache, cacheKey, sliced);
+  }
+  return sliced;
+}
+
+/**
+ * Reverse geocode latitude and longitude to normalized location object via OpenStreetMap Nominatim
+ */
+export async function reverseGeocode(lat, lng) {
+  const nLat = parseFloat(lat);
+  const nLng = parseFloat(lng);
+
+  if (isNaN(nLat) || isNaN(nLng) || nLat < -90 || nLat > 90 || nLng < -180 || nLng > 180) {
+    return null;
+  }
+
+  // Cache key with 4 decimal digits precision (~11 meters)
+  const cacheKey = `${nLat.toFixed(4)},${nLng.toFixed(4)}`;
+  const cached = getCached(nominatimReverseCache, cacheKey);
+  if (cached) return cached;
+
+  // 1. Query OpenStreetMap Nominatim Reverse Geocoding API
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${nLat}&lon=${nLng}&format=json&addressdetails=1`;
+    const res = await rateLimitedNominatimFetch(url);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && !data.error) {
+        const normalized = normalizeNominatimResult(data);
+        // Ensure lat/lng match exact request coordinates
+        normalized.latitude = nLat;
+        normalized.longitude = nLng;
+        setCached(nominatimReverseCache, cacheKey, normalized);
+        return normalized;
+      }
+    }
+  } catch (err) {
+    console.warn("OpenStreetMap Nominatim reverse geocode error, using coordinate fallback:", err.message);
+  }
+
+  // 2. Safe coordinate-based fallback without hardcoding Tamil Nadu
+  const fallback = {
+    id: `coord_${cacheKey}`,
+    latitude: nLat,
+    longitude: nLng,
+    address: `Coordinates: ${nLat.toFixed(4)}, ${nLng.toFixed(4)}`,
+    city: "Identified Coordinates",
+    district: "Local Region",
+    state: "India",
+    region: "India",
+    pincode: "",
+    postalCode: "",
+    country: "India",
     countryCode: "IN",
     countryName: "India",
-    regionName: "Tamil Nadu",
-    districtName: "Thoothukudi",
-    latitude: lat || 9.1724,
-    longitude: lng || 77.8687
+    placeName: `${nLat.toFixed(4)}, ${nLng.toFixed(4)}`,
+    formattedAddress: `${nLat.toFixed(4)}, ${nLng.toFixed(4)}, India`
   };
+
+  return fallback;
 }
+

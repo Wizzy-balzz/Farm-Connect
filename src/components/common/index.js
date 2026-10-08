@@ -21,4 +21,6 @@ export { ConfirmDialog } from "./ConfirmDialog.jsx";
 export { ErrorBoundary } from "./ErrorBoundary.jsx";
 export { ContactFarmerModal } from "./ContactFarmerModal.jsx";
 export { GlobalLocationSelector } from "./GlobalLocationSelector.jsx";
+export { OsmLocationPicker } from "./OsmLocationPicker.jsx";
+export { OsmRouteMap } from "./OsmRouteMap.jsx";
 export { MapBoxView } from "./MapBoxView.jsx";

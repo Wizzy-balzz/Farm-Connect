@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, memo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "../../components/common/SearchBar.jsx";
 import { ProductCard } from "../../components/product/ProductCard.jsx";
 import { ProductCardSkeleton } from "../../components/common/Skeleton.jsx";
@@ -15,13 +15,16 @@ import { useLanguage } from "../../hooks/useLanguage.js";
 import { useDebounce } from "../../hooks/useDebounce.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
 import { CATEGORIES } from "../../utils/constants.js";
+import { getCategoryLabel } from "../../utils/controlledVocabulary.js";
+import { ProductTranslationsModal } from "../../components/product/ProductTranslationsModal.jsx";
 
 function MyProductsBase({ openAdd }) {
-  const { t } = useLanguage();
-  const { farmerProfile } = useAuth();
-  const { products, addProduct, updateProduct, deleteProduct } = useData();
+  const { t, lang } = useLanguage();
+  const { farmerProfile, user } = useAuth();
+  const { products, addProduct, updateProduct, deleteProduct, fetchProducts } = useData();
   const { notifySuccess } = useNotifications();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
@@ -29,6 +32,7 @@ function MyProductsBase({ openAdd }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [translatingProduct, setTranslatingProduct] = useState(null);
 
   const debouncedSearch = useDebounce(search, 350);
 
@@ -92,8 +96,37 @@ function MyProductsBase({ openAdd }) {
         </div>
         <div className="fc-flex-gap-12 fc-flex-wrap">
           <SearchBar value={search} onChange={setSearch} placeholder={t("searchYourProducts")} />
+          <Button variant="outline" onClick={() => navigate("/farmer/sell-smarter")}>
+            🤖 AI Selling Agent
+          </Button>
           <Button variant="accent" onClick={handleAdd}>+ {t("addProduct")}</Button>
         </div>
+      </div>
+
+      {/* Phase 3D-1: AI Selling Agent Strategy Banner */}
+      <div
+        style={{
+          padding: "12px 18px",
+          background: "var(--accent-light)",
+          border: "1px solid var(--accent)",
+          borderRadius: "var(--radius-md)",
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: "20px" }}>🛒</span>
+          <span style={{ fontSize: "13px", color: "var(--text)" }}>
+            <strong>Optimize your harvest sales:</strong> Use the AI Marketplace Selling Agent to analyze regional wholesale demand, refine bulk pricing tiers, and generate outreach messages.
+          </span>
+        </div>
+        <Button variant="accent" size="sm" onClick={() => navigate("/farmer/sell-smarter")} style={{ fontWeight: 700 }}>
+          Launch Selling Agent →
+        </Button>
       </div>
 
       <div className="fc-flex-gap-8 fc-flex-wrap fc-mb-16">
@@ -103,7 +136,7 @@ function MyProductsBase({ openAdd }) {
             className={`fc-radio-chip ${category === c ? "active" : ""}`}
             onClick={() => setCategory(c)}
           >
-            {c === "All" ? t("all") : c}
+            {getCategoryLabel(c, lang)}
           </button>
         ))}
       </div>
@@ -118,7 +151,16 @@ function MyProductsBase({ openAdd }) {
       ) : (
         <div className="fc-product-grid">
           {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} farmerName={farmerProfile.name} region={farmerProfile.region} mode="farmer" onEdit={handleEdit} onDelete={handleDeleteRequest} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              farmerName={farmerProfile.name}
+              region={farmerProfile.region}
+              mode="farmer"
+              onEdit={handleEdit}
+              onDelete={handleDeleteRequest}
+              onManageTranslations={(prod) => setTranslatingProduct(prod)}
+            />
           ))}
         </div>
       )}
@@ -126,6 +168,15 @@ function MyProductsBase({ openAdd }) {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? t("editProduct") : t("addProduct")} width={560}>
         <ProductForm key={editing?.id || "new"} initialValue={editing} onSubmit={handleSubmit} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      {translatingProduct && (
+        <ProductTranslationsModal
+          open={!!translatingProduct}
+          onClose={() => setTranslatingProduct(null)}
+          product={translatingProduct}
+          onUpdated={fetchProducts}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleting}

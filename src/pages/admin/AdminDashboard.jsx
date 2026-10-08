@@ -9,13 +9,16 @@ import {
   Avatar,
   SearchBox,
   Tabs,
+  Modal,
   Skeleton,
   TableRowSkeleton,
   EmptyState,
 } from "../../components/common/index.js";
+import { addTrackingEvent } from "../../services/trackingService.js";
 import { BarChart } from "../../components/charts/BarChart.jsx";
 import { DonutChart } from "../../components/charts/DonutChart.jsx";
 import { LineChart } from "../../components/charts/LineChart.jsx";
+import { AnalyticsDashboard } from "../../components/analytics/AnalyticsDashboard.jsx";
 import {
   ClipboardList,
   Package,
@@ -30,6 +33,7 @@ import { formatCurrency, formatDate } from "../../utils/formatters.js";
 import { useData } from "../../hooks/useData.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
+import { ProductTranslationsModal } from "../../components/product/ProductTranslationsModal.jsx";
 
 const ShieldIcon = () => (
   <svg
@@ -81,8 +85,8 @@ function getStatusBadgeVariant(status) {
 
 function AdminDashboardBase() {
   const { t } = useLanguage();
-  const { products, orders } = useData();
-  const { notifySuccess } = useNotifications();
+  const { products, orders, fetchOrders, fetchProducts } = useData();
+  const { notifySuccess, notifyError } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,6 +95,38 @@ function AdminDashboardBase() {
   const [reviews, setReviews] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [translationModalProduct, setTranslationModalProduct] = useState(null);
+
+  // Order Tracking Checkpoint Modal State
+  const [trackingModalOrder, setTrackingModalOrder] = useState(null);
+  const [adminCheckpointStatus, setAdminCheckpointStatus] = useState("In Transit");
+  const [adminCheckpointLocation, setAdminCheckpointLocation] = useState("");
+  const [adminCheckpointLat, setAdminCheckpointLat] = useState("");
+  const [adminCheckpointLng, setAdminCheckpointLng] = useState("");
+  const [adminCheckpointDesc, setAdminCheckpointDesc] = useState("");
+  const [adminUpdatingTracking, setAdminUpdatingTracking] = useState(false);
+
+  const handleAdminTrackingSubmit = async (e) => {
+    e.preventDefault();
+    if (!trackingModalOrder || !adminCheckpointLocation.trim()) return;
+    setAdminUpdatingTracking(true);
+    try {
+      await addTrackingEvent(trackingModalOrder.id, {
+        status: adminCheckpointStatus,
+        location: adminCheckpointLocation.trim(),
+        latitude: adminCheckpointLat ? parseFloat(adminCheckpointLat) : null,
+        longitude: adminCheckpointLng ? parseFloat(adminCheckpointLng) : null,
+        description: adminCheckpointDesc.trim()
+      });
+      notifySuccess(`Tracking event '${adminCheckpointStatus}' saved for ${trackingModalOrder.id}`);
+      setTrackingModalOrder(null);
+      fetchOrders?.();
+    } catch (err) {
+      notifyError?.(err.message || "Failed to update tracking event.");
+    } finally {
+      setAdminUpdatingTracking(false);
+    }
+  };
 
   // Tab switcher
   const pathSegment = location.pathname.split("/").pop();
@@ -101,6 +137,8 @@ function AdminDashboardBase() {
     "products",
     "orders",
     "reviews",
+    "delivery",
+    "analytics",
   ].includes(pathSegment)
     ? pathSegment
     : "overview";
@@ -353,6 +391,7 @@ function AdminDashboardBase() {
 
   const adminTabs = [
     { id: "overview", label: t("admin.overview") || "Overview & Analytics" },
+    { id: "analytics", label: "📊 AI Analytics & Reports" },
     { id: "users", label: `${t("navigation.users") || "Users"} (${users.length})` },
     { id: "farmers", label: `${t("navigation.farmers") || "Farmers"} (${farmersList.length})` },
     { id: "vendors", label: `${t("navigation.buyers") || "Buyers"} (${vendorsList.length})` },
@@ -623,7 +662,11 @@ function AdminDashboardBase() {
                           {u.verificationStatus || "Pending"}
                         </Badge>
                       </td>
-                      <td>★ {u.rating?.toFixed(1) || "5.0"}</td>
+                      <td>
+                        ★ {u.rating != null && u.rating !== "" && !Number.isNaN(Number(u.rating))
+                          ? Number(u.rating).toFixed(1)
+                          : "5.0"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -770,6 +813,7 @@ function AdminDashboardBase() {
                     <th>Price / Unit</th>
                     <th>Grower</th>
                     <th>Stock</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -781,6 +825,17 @@ function AdminDashboardBase() {
                       <td><strong>{formatCurrency(p.price)}</strong> / {p.unit}</td>
                       <td>{getFarmerName(p.farmerId)}</td>
                       <td>{p.stock} {p.unit}</td>
+                      <td style={{ textAlign: "right" }}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          style={{ fontSize: "11px", padding: "4px 8px" }}
+                          onClick={() => setTranslationModalProduct(p)}
+                          title="Manage multilingual product translations"
+                        >
+                          🌐 Translations
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -788,6 +843,16 @@ function AdminDashboardBase() {
             </div>
           )}
         </Card>
+      )}
+
+      {/* Product Translations Modal */}
+      {translationModalProduct && (
+        <ProductTranslationsModal
+          open={!!translationModalProduct}
+          onClose={() => setTranslationModalProduct(null)}
+          product={translationModalProduct}
+          onUpdated={fetchProducts}
+        />
       )}
 
       {/* TAB 6: Orders Ledger */}
@@ -818,6 +883,7 @@ function AdminDashboardBase() {
                     <th>Subtotal</th>
                     <th>Delivery Address</th>
                     <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -844,11 +910,142 @@ function AdminDashboardBase() {
                       <td>
                         <Badge variant={getStatusBadgeVariant(o.status)}>{o.status}</Badge>
                       </td>
+                      <td>
+                        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            style={{ fontSize: "11px", padding: "4px 8px" }}
+                            onClick={() => navigate(`/vendor/tracking/${o.id}`)}
+                            title="View OpenStreetMap tracking route"
+                          >
+                            🗺️ Map
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            style={{ fontSize: "11px", padding: "4px 8px" }}
+                            onClick={() => {
+                              setTrackingModalOrder(o);
+                              setAdminCheckpointStatus(o.status || "In Transit");
+                              setAdminCheckpointLocation(o.deliveryCity || "");
+                              setAdminCheckpointLat("");
+                              setAdminCheckpointLng("");
+                              setAdminCheckpointDesc("");
+                            }}
+                            title="Add tracking checkpoint"
+                          >
+                            Update
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          )}
+
+          {/* Admin Tracking Checkpoint Modal */}
+          {trackingModalOrder && (
+            <Modal
+              isOpen={Boolean(trackingModalOrder)}
+              onClose={() => setTrackingModalOrder(null)}
+              title={`Update Tracking Checkpoint (${trackingModalOrder.id})`}
+            >
+              <form onSubmit={handleAdminTrackingSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div>
+                  <label className="fc-label" style={{ fontSize: 12, marginBottom: 4, display: "block" }}>
+                    Transit Stage / Status
+                  </label>
+                  <select
+                    className="fc-select"
+                    value={adminCheckpointStatus}
+                    onChange={(e) => setAdminCheckpointStatus(e.target.value)}
+                    style={{ width: "100%" }}
+                  >
+                    <option value="Order Placed">Order Placed</option>
+                    <option value="Order Confirmed">Order Confirmed</option>
+                    <option value="Packed">Packed</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Reached Destination Hub">Reached Destination Hub</option>
+                    <option value="Out for Delivery">Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="fc-label" style={{ fontSize: 12, marginBottom: 4, display: "block" }}>
+                    Checkpoint Location (City, Transit Hub, State) *
+                  </label>
+                  <input
+                    type="text"
+                    className="fc-input"
+                    placeholder="e.g. Nagpur Highway Transit Facility, Maharashtra"
+                    value={adminCheckpointLocation}
+                    onChange={(e) => setAdminCheckpointLocation(e.target.value)}
+                    required
+                    style={{ width: "100%" }}
+                  />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <label className="fc-label" style={{ fontSize: 12, marginBottom: 4, display: "block" }}>
+                      Latitude (Optional)
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="fc-input"
+                      placeholder="e.g. 21.1458"
+                      value={adminCheckpointLat}
+                      onChange={(e) => setAdminCheckpointLat(e.target.value)}
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="fc-label" style={{ fontSize: 12, marginBottom: 4, display: "block" }}>
+                      Longitude (Optional)
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="fc-input"
+                      placeholder="e.g. 79.0882"
+                      value={adminCheckpointLng}
+                      onChange={(e) => setAdminCheckpointLng(e.target.value)}
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="fc-label" style={{ fontSize: 12, marginBottom: 4, display: "block" }}>
+                    Checkpoint Description / Logistics Log
+                  </label>
+                  <textarea
+                    className="fc-input"
+                    rows={2}
+                    placeholder="e.g. Scanned at regional hub gate; cold storage transfer."
+                    value={adminCheckpointDesc}
+                    onChange={(e) => setAdminCheckpointDesc(e.target.value)}
+                    style={{ width: "100%" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+                  <Button type="button" variant="outline" onClick={() => setTrackingModalOrder(null)} disabled={adminUpdatingTracking}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="primary" disabled={adminUpdatingTracking}>
+                    {adminUpdatingTracking ? "Saving..." : "Record Checkpoint"}
+                  </Button>
+                </div>
+              </form>
+            </Modal>
           )}
         </Card>
       )}
@@ -968,6 +1165,11 @@ function AdminDashboardBase() {
             </div>
           )}
         </Card>
+      )}
+
+      {/* TAB 8: Advanced Analytics & AI Reports */}
+      {activeTab === "analytics" && (
+        <AnalyticsDashboard />
       )}
     </div>
   );

@@ -1,0 +1,2897 @@
+[
+  {
+    "style": null,
+    "text": "STORE MANAGEMENT SYSTEM",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "23CS54C \u2013 MODERN WEB TECHNOLOGIES",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Submitted by",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "HARIRAAM B 24104085",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "In partial fulfillment for the award of the degree",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "of",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "BACHELOR OF ENGINEERING/TECHNOLOGY",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "in",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "COMPUTER SCIENCE AND ENGINEERING/ INFORMATION TECHNOLOGY",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "NATIONAL ENGINEERING COLLEGE",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "(An Autonomous Institution affiliated to Anna University, Chennai)",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "K.R.NAGAR, KOVILPATTI - 628503",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "OCTOBER - 2026",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "NATIONAL ENGINEERING COLLEGE",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "(An Autonomous Institution affiliated to Anna University, Chennai)",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "K.R.NAGAR, KOVILPATTI - 628503",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "BONAFIDE CERTIFICATE",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "This is to certify that this project report, \u201cStore Management System\u201d, is the bonafide work of B HARIRAAM(24104085) who carried out the project work under my supervision.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "Course Instructor/Guide",
+    "align": "RIGHT (2)"
+  },
+  {
+    "style": null,
+    "text": "Submitted to the 23CS54C \u2013 MODERN WEB TECHNOLOGIES Viva-Voce examination held at National Engineering College, K.R.Nagar, Kovilpatti on ____________",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "Internal Examiner\tCo Examiner",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "TABLE OF CONTENTS",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "CH NO\tTITLE\tPAGE NO",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "1\tINTRODUCTION\t3",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "2\tOBJECTIVES\t4",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "3\tDESCRIPTION\t5",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "4\tCLASS DIAGRAM\t6",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "5\tTABLE STRUCTURES\t7",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "6\tER DIAGRAM\t16",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "7\tTECH STACK\t18",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "8\tMODULES\t19",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "9\tCONCLUSION\t70",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 1",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "INTRODUCTION",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "In the modern business environment, the efficient management of store operations plays a vital role in ensuring the smooth functioning of manufacturing and trading organizations. Handling procurement, inventory, material movement, and billing through manual or paper-based methods is time-consuming, error-prone, and lacks transparency. There is an urgent need for a reliable, digital solution that brings all these operations under one unified platform.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "The Store Management System is a comprehensive, full-stack web application designed to digitize and automate the complete lifecycle of store operations from raising purchase orders to issuing materials to departments. The system was developed to meet the real-world operational requirements of KR Exports, a trading and export organization, and is deployed in a live production environment.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "The application is organized into three major functional domains: Master Data Management, which covers all foundational records such as items, suppliers, departments, and stores; Transaction Management, which handles day-to-day operations including purchase orders, gate inwards, receipts, bill entries, item issues, and gate passes; and Reports & Analytics, which provides management with real-time visibility into all store activities through dynamic, exportable reports.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "The system is hosted at https://krexports.org and is supported by a Jenkins-based CI/CD pipeline for automated builds and deployments, making it production-ready and maintainable. This report documents the design, development, and implementation of the Store Management System, providing a complete technical overview of its architecture, features, and functionality.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 2",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "OBJECTIVES",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Digitize Store Operations: Replace manual record-keeping with a digital system to improve accuracy, efficiency, and data accessibility.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Centralize Master Data: Maintain consistent and accurate master data for items, departments, suppliers, stores, and other entities.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Automate the Procurement Lifecycle: Streamline procurement from purchase orders to bill verification with complete traceability.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Track Material Movement: Monitor and record all inward and outward movement of goods for effective inventory control.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Manage Item Issuance to Departments: Record item issuance to departments to ensure accountability and proper stock management.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Enforce User Authentication and Role-Based Access: Secure the application using JWT authentication and protected routes to prevent unauthorized access.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Provide Dynamic Reporting and Analytics: Generate detailed reports and export them to Excel for effective analysis and decision-making.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Ensure System Security and Reliability: Implement security measures such as Helmet, CORS, rate limiting, and payload restrictions to protect the system.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Deploy a Scalable, Maintainable Architecture: Use a modular REST API architecture with separate frontend, backend, and database layers for easier maintenance and scalability.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "To Enable Continuous Deployment via CI/CD: Automate application builds and deployments using Jenkins for consistent and efficient production updates at KR Exports.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 3",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "DESCRIPTION",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The Store Management System is a full-stack web application developed to manage and automate store and inventory operations at KR Exports. The system consists of five major functional areas:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "1. Master Data Management",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "This module maintains centralized master records, including departments, suppliers, stores, items, product heads and sub-heads, units of measure (UOM), parties, purchase types, and states. These records ensure consistency and accuracy across all store transactions.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "2. Transaction Management",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "This module manages day-to-day store activities, including Purchase Orders, Gate Inward, Material Receipts, Bill Entry, Bill Verification, Item Issue, Gate Pass In, Gate Pass Out, and Purchase Order Cancellation. Each transaction is linked to relevant master data, ensuring traceability, accountability, and effective inventory control.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "3. Reports and Dashboard",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "The Reports module generates dynamic reports for purchase orders, receipts, item issues, bills, and gate pass activities using filters such as date, department, supplier, and item. Reports can be exported to Excel for further analysis. The Dashboard provides an overview of pending orders and recent store activities.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "4. Security and Access Control",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "The system uses bcrypt for password hashing and JSON Web Token (JWT) authentication to secure user access. Protected API routes, Axios response interceptors, and request rate limiting help prevent unauthorized access and manage invalid or expired sessions.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "5. Technology and Deployment",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "The application uses React for the frontend, Node.js for the backend, and MySQL with Sequelize for database management. It is deployed at https://krexports.orgsvg, with a Jenkins CI/CD pipeline automating application builds and deployments. The modular architecture supports maintainability, scalability, and future enhancements.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 4",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "CLASS DIAGRAM",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 5",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "TABLE STRUCTURES",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Users",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Supplier Details",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Uoms :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "States :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Sub_Heads :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Store Master :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "ProductHead :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Department :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Purchase_Type :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "ItemMaster :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Party_master :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Purchase_orders :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Purchase_order_details :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Item :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Gate_inward :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Gate_inward_details :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Receipts",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Receipt_details :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Bill_entry_details :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Item_issue :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Item_issue_detail :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Bill_entries :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Cancel_orders :",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 6",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "ER DIAGRAM",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "ADDITIONAL MASTER TABLES",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 7",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "TECH STACK",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "7.1 TECH STACK",
+    "align": "None"
+  },
+  {
+    "style": "Heading 2",
+    "text": "7.2 ARCHITECTURE OVERVIEW",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 8",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "MODULES",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.0 Design Approach",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Each module of the Store Management System is described here the way a system design problem is solved: by walking through the same seven steps in the same order, every time. This keeps the explanation of every module complete and comparable, and shows why each design decision was taken rather than only what the screen looks like.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "Shared baseline for all modules",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Non-functional baseline. Every request travels through Helmet (HTTP hardening), CORS, a payload size limit, a rate limiter and the JWT authentication middleware before it reaches a controller. All data lives in a single MySQL database, so the system chooses consistency over availability in CAP terms (CP): a user may briefly be unable to save if the database is unreachable, but two users can never see conflicting versions of a purchase order or a stock balance. Money columns use DECIMAL, never floating point, so totals reconcile exactly.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "Sizing baseline (assumptions).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "A single Node.js process and one MySQL instance handle this load comfortably. The design keeps the application stateless (JWT instead of server sessions), so extra Node.js instances can be added behind a load balancer if usage grows.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.0 Overall request flow of the Store Management System",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.1 FOLDER STRUCTURE",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.1 Highlevel view of project",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "8.1.1 BACKEND FOLDER",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.2 \u2013 Backend Folder Structure \u2013 Overall organization of backend files and directories showing modular architecture.",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.3 config Folder structure",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.4 Controller Folder",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "8.1.2 FRONTEND FOLDER",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "FIG 8.1.7 Structure of Frontend Folder",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.8 Structure of frontend/src",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.9 Structure of frontend/src/pages Folder",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.10 Structure of frontend/src/routes and frontend/src/services",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.1.11 Structure of frontend/src/components",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.2 USER AUTHENTICATION & ACCESS CONTROL",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Provides tokenized authentication, secure credential management, and Role-Based Access Control (RBAC) across the enterprise, preventing unauthorized data modifications.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "A user signs in with a username and password and receives a signed JWT plus a profile (id, full_name, role).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "A signed-in user can change their own password; administrators can register new users.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Four roles \u2013 admin, manager, operator, viewer \u2013 decide which endpoints a user may call.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Each account has an active / inactive status so access can be withdrawn without deleting the record, and the last login time is stored.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The browser redirects unauthenticated users to the login screen (protected routes) and handles an expired or invalid token centrally.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "Out of scope: self-service sign-up, social login / SSO and multi-factor authentication.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Security: passwords are stored only as bcryptjs hashes with auto-generated salts; the hash is never returned by the API.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Brute-force defence: at most 15 login attempts per 15 minutes per IP address on /api/auth/login.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Session length: tokens expire after 12 hours, which limits the damage of a stolen token while avoiding repeated logins in one shift.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Scalability: because tokens are stateless, any server instance can validate a request without a shared session store.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Latency target: login under 500 ms (dominated by the deliberate cost of bcrypt); token verification adds only microseconds per request.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: the user table is a single MySQL source of truth \u2013 consistency is preferred, so a disabled account is refused immediately on the next login.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.2.A Low-level architecture \u2013 USER AUTHENTICATION & ACCESS CONTROL",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Login.jsx posts the credentials; rateLimiter.js counts the attempt for the caller\u2019s IP.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "authController looks the user up by username (unique index), checks that the status is active, and compares the password with the stored bcrypt hash.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "On success it updates last_login, signs a JWT (12 h) and returns the token with the profile.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The client stores the token; api.js adds it as a Bearer header on every later request.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "auth.js verifies the signature and expiry and checks the role before the route handler runs.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "A 401 response triggers the Axios interceptor, which clears the session and sends the user back to the login screen.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Only /api/auth/login is public. The remaining paths are representative routes derived from the authController methods.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The unique index on username makes the login look-up a single index read and prevents duplicate accounts.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "No other table has a foreign key to Users, so authentication can be changed independently of the store data.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.2.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.2: User Login & Authentication Interface",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.3 MASTER DATA MANAGEMENT",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Unifies foundational reference datasets and enterprise catalogs that establish the baseline for all store operations, inventory classification, and vendor management.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Create, view, edit and delete records for: Item, Supplier, Department, Store Master, Product Head, Sub Head, UOM, State, Purchase Type, Party Master and Item Master (gate-pass items).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Central item catalog: item code, name, department, sub head, UOM, unit rate, opening stock, min / max stock level (reorder level), HSN code, location.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Supplier registry: account name, place, address, delivery address, GSTIN, PAN, contact details and opening credit / debit.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Search and filter large lists: suppliers by department, place and GST status; items by department, sub head and UOM; sorting and page size.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Bulk upload of items from a CSV file.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Purchase Type records carry accounting formulas (assessable value, round off, lorry freight) and SGST / CGST / IGST / TCS ledger mappings.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Provide searchable reference dropdowns to every transaction screen so users pick, rather than type, master values.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Read-heavy: masters are read many times more often than they are changed (roughly 100 reads per write), so look-ups must be fast.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Scale of lists: with 5,490 suppliers and 11,011 items, lists are paginated on the server (10 per page by default) and never loaded whole.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Data quality: unique keys on department name, state name, store name and purchase type prevent duplicates; item and sub head records link to their parent through department_id / SubHeadCode.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Access control: write endpoints are restricted by role (for example, the viewer role is read-only).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency first \u2013 a new supplier or item must be visible to every user as soon as it is saved, because transactions depend on it immediately.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.3.A Low-level architecture \u2013 MASTER DATA MANAGEMENT",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "A master page (for example Item.jsx) sends a GET with search text, filter values, sort and page size as query parameters.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The matching controller turns them into a Sequelize where / order / limit clause and returns the page plus the total count.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Add / edit forms POST or PUT one record; the controller validates required fields and unique keys before writing.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Transaction screens reuse the same endpoints through SearchSelect, so every dropdown shows current master data.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "{master} stands for one of: departments, suppliers, items, item-masters, party-masters, store-masters, product-heads, sub-heads, uoms, states, purchase-types. Paths are representative routes derived from the controller methods in Chapter 4.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Recommended extra index (not yet in the schema): an index on Item(DepartmentId, SubHeadCode) and on Supplier Details(Place) would speed the department / sub head / place filters as the catalogs grow.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.3.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.1 Department master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The screen lists departments and provides controls to add, edit, or delete department records. The department names appear in a single list, allowing the user to review the organizational units used in store transactions. Maintaining these records provides consistent department selections when materials are issued or reports are filtered.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.2 Editing a department",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "An existing department name can be changed in the list and saved or cancelled using the adjacent controls. The selected row changes into an editable text field, while the save and cancel icons control whether the revision is retained. This enables corrections to a department name directly from the list without opening a separate entry screen.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.3 Adding a department",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The user enters a department name and selects Add Department to create a new record. The screenshot shows a sample name entered in the new department field, ready for submission. This step establishes a department record that can subsequently be selected in the relevant master data and transaction screens.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.4 Supplier master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The supplier registry displays vendor records with search, filtering, and edit or delete controls. The interface combines supplier search with department, place, GST status, and page size filters. Each supplier entry presents identifying information and action buttons so users can locate a vendor and maintain its details from the same screen.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.5 Filtering suppliers by place",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The place dropdown narrows the supplier list to vendors associated with a selected location. The open dropdown includes a search field and available supplier locations. Selecting a place helps users find vendors in a particular area, while the other filters can further narrow the records displayed.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.6 New supplier entry",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The supplier form captures identification, contact, address, and opening balance information for a new vendor. The entry panel groups supplier identity and communication details with address and commercial information. Recording these details gives purchase and inward transactions a consistent vendor reference and reduces repeated manual entry.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.7 Item master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The item catalog displays stock items with their classifications, units, rates, and stock levels, alongside maintenance controls. The list presents item codes and descriptions together with department, classification, unit, and stock information. Search, sorting, and filters help users navigate a large catalog, while the add and upload controls support maintaining item records.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.8 Filtering items by sub head",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The sub head dropdown filters the item catalog by the selected product classification. The open sub head selector shows the available classifications and a search box for locating a specific option. Applying this filter helps users review related items together and find an item without scanning the entire catalog.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.9 Filtering items by department",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The department dropdown limits the displayed items to those associated with the selected department. The department selector displays organizational units that can be used to narrow the catalog. This view helps users review the items associated with a particular department alongside the existing sub head and unit filters.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.10 New item entry",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The item form records department, classification, item name, unit, stock, and pricing details before saving the item. The form brings the item identification and classification fields together with quantity and commercial fields. Completing these fields defines the reference information used when the item is selected in purchase, receipt, and issue transactions.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.11 Purchase type master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Purchase types are listed with their codes and ledger mappings, with controls to add or modify entries. The table places each purchase type alongside its description, commodity, and tax ledger columns. This allows users to review the accounting references associated with different purchase categories and access the edit or delete actions for a record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.12 Adding a purchase type",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The form captures a purchase type and its related accounting and tax ledger information. The entry dialog groups purchase category details with the ledger fields required for accounting. The visible save and close controls allow users to submit the completed record or leave the entry process.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.13 Unit of measurement master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The screen maintains measurement units used for item quantities and provides edit and delete controls. The list displays unit names and their codes, with a page size control for browsing the records. A shared unit registry helps keep quantity labels consistent when items are entered and used in store transactions.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.14 Adding a unit of measurement",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The user enters a unit name and selects Save UOM to make it available for item records. The screenshot shows the unit name field populated with LTRS and the save and cancel controls underneath. Saving the entry adds a reusable measurement label for item quantities, while cancellation leaves the entry unfinished.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.3.15 State master list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The state registry supports searching and maintaining state names used in supplier and transaction records. The screen displays individual state records with their codes and edit or delete actions. The search field helps users locate a state quickly when maintaining the reference data used for vendor addresses and tax jurisdiction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.4 PURCHASE ORDER (PO) MANAGEMENT",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Orchestrates the procurement lifecycle, from raising purchase orders with approved vendors to multi-item price calculations, status tracking, and authorized order cancellations.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Raise a PO for a supplier: order date, party, address / place, reference number and remarks; the PO number (for example PO-772) is generated automatically in sequence.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Multi-item line engine: each line takes item, quantity, unit rate, discount %, GST type (SGST + CGST or IGST), packing & forwarding, lorry freight and MRS number, and shows the line total instantly.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Order summary: items subtotal, total discount, total tax, P&F, lorry freight, round off and grand total.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Lifecycle tracking: Draft \u2192 Pending / Approval \u2192 Approved \u2192 Inward Created \u2192 Completed / Cancelled.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Register: search by order number, party or reference; filter by party and status; sort; expand a row to see its lines; copy, edit or delete a PO.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Controlled cancellation: a PO is cancelled only with a mandatory reason, and not once its items have arrived at the gate.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Accuracy: amounts are DECIMAL(15,2) and unit rates DECIMAL(15,6), so a PO total always matches the sum of its lines. Example (Fig 8.4.3\u20138.4.4): \u20b920,000 \u2212 \u20b91,800 discount = \u20b918,200; GST is 18 % of (\u20b918,200 + \u20b95,000 P&F + \u20b95,000 freight) = \u20b95,076; grand total = \u20b918,200 + \u20b95,000 + \u20b95,000 + \u20b95,076 = \u20b933,276.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Atomicity: the header and all its lines are saved together in one transaction; a PO never exists half-saved.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Unique numbering: the PO number is allocated on the server and the primary key is the final guard against duplicates when two clerks save at the same time.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Server-side validation: totals sent by the browser are recomputed on the server before saving.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Auditability: every cancellation stores a reason and date; all tables carry createdAt / updatedAt.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Responsiveness: the register opens in under 1 second; line details load only when a row is expanded.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency first \u2013 the status of a PO must be identical for the store, accounts and management at all times.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.4.A Low-level architecture \u2013 PURCHASE ORDER (PO) MANAGEMENT",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "PurchaseOrder.jsx opens the create modal; the next PO number and the party list are fetched.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The user picks a party (address and place are filled in) and adds item lines; the page calculates each line and the summary.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Save sends the header and all lines in one request; purchaseOrderController recomputes the totals and writes Purchase_orders and Purchase_order_details in a single transaction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Later stages (gate inward, receipt) read this PO by OrderNo and move its status forward.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Cancel: cancelOrderController checks that no gate inward exists for the order, stores the reason in Cancel_orders and marks the PO cancelled.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are representative REST routes derived from the controller methods in the class diagram (Chapter 4).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Relationships: one Supplier has many POs; one PO has many detail lines; a PO may have one cancellation record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Existing indexes on PartyCode and OrderNo serve the party filter and the line look-up. Recommended additions: an index on Purchase_orders(Status, OrderDate) for the status filter and the dashboard counts.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.4.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.4.1 Purchase order list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Purchase orders are displayed with supplier details, status, item count, and total value, together with copy, edit, and delete controls. The register combines order identifiers and dates with party names, reference numbers, status labels, and totals. Search and filter controls help users locate a purchase order, while the item count provides access to its detailed contents.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.4.2 Creating a purchase order",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The order form captures the order date, supplier, and item information before the purchase order is saved. The form separates supplier and order information from the item entry and order summary areas. Users can add the required materials and review the assembled order before selecting the save control.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.4.3 Purchase order item calculation",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The item entry area records quantity, unit rate, discount, tax, and additional charges and shows the calculated item total. The visible example includes a selected item, quantity, unit rate, GST fields, packing and forwarding, and freight charges. The calculated total gives users a way to review the financial effect of these entries before adding the line to the order.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.4.4 Purchase order financial summary",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The order summary displays the added items and a breakdown of charges and taxes leading to the grand total. The added items appear above a summary of the basic amount, discount, taxes, and additional charges. Reviewing this breakdown helps users check that the final order value reflects the intended quantities and commercial terms.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.4.5 Expanded purchase order details",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Expanding an order reveals its line items, quantities, unit rates, discounts, taxes, and item totals. The expanded row keeps the purchase order header visible while showing the underlying material details. This allows the user to compare the order total with its individual quantities, rates, and charges without opening the edit form.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.5 GOODS INWARD & INVENTORY RECEIPT (GRN)",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Manages the physical arrival of materials. Combines gate consignment logging with formal Goods Receipt Note (GRN) stock induction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Gate Inward: log an arrival with an automatic inward number (for example GI-771), inward date, party, the purchase order being delivered, and the supplier\u2019s invoice number and date.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Record received quantity against pending quantity for each PO line; one PO can have several inward batches (partial deliveries).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Duplicate invoice check: warn when the same supplier invoice is entered twice.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Receipt (GRN): select party and PO, pick the gate-inward batches covered, add invoice, DC number and dates, confirm received items with rate, and enter discount, GST, P&F, lorry freight and round off to get the grand total.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Receiving goods updates the stock balance of the received items and advances the PO status to Inward Created / Completed.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Registers with search, party filter and sort; expand a GRN to trace it back to its gate inward and PO; edit and delete (the delete removes the linked chain consistently).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Traceability: PO \u2192 Gate Inward \u2192 GRN is linked by OrderNo and GateInwardNo, so any stock line can be traced to the order that created it.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Integrity: received quantity cannot exceed what is still pending on the PO line; the same invoice cannot be booked twice.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Atomic chain operations: creating a GRN (header, lines, stock update, status change) and deleting a chain run in one transaction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Responsiveness: the dependent dropdowns (party \u2192 open POs \u2192 PO items) answer in under 500 ms.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Auditability: createdAt / updatedAt on every row; status values (Draft, InwardCreated) show progress.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency first \u2013 stock must never be counted twice or lost if two users receive against the same PO.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.5.A Low-level architecture \u2013 GOODS INWARD & INVENTORY RECEIPT (GRN)",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "GateInward.jsx: the user chooses a party; gateInwardController returns that party\u2019s open POs (getPurchaseOrdersByParty) and, after a PO is chosen, its items with pending quantity (getItemsByOrder).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Save writes Gate_inward and Gate_inward_details; the duplicate-invoice check runs first.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Receipt.jsx: the user chooses a party and PO; receiptController lists the available gate-inward batches and their items (getAvailableGateInwards, getGateInwardItems).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Save writes Receipts and Receipt_details, updates stock, and moves the PO status forward in the same transaction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Bill Entry (next module) later reads the GRN by GRNNo.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are representative REST routes derived from the controller methods in the class diagram (Chapter 4).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Recommended additions: indexes on Gate_inward(OrderNo) and Receipts(PartyCode, InwardDate) to speed the dependent dropdowns and the register filter.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.5.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.1 Gate inward list",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The gate inward register displays incoming consignments and provides search, supplier filtering, and record maintenance controls. The list places supplier names and inward identifiers beside record actions, while the controls above support searching and sorting. This register helps users locate a recorded material arrival for review or further processing.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.2 Selecting a supplier for gate inward",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The supplier dropdown identifies the party delivering materials before a purchase order is selected. The entry dialog shows the inward number and date together with a searchable party selector. Choosing the supplier establishes the context for the purchase order and invoice fields that follow in the inward entry workflow.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.3 Linking gate inward to a purchase order",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The purchase order dropdown links the inward record to an order for the selected supplier. The screenshot shows a purchase order option for the selected party, including its order date and value. Linking the arrival to that order provides a reference for checking the incoming materials against the procurement record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.4 Goods receipt register",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The receipt list displays goods receipt records with supplier, purchase order, invoice, inward, and amount information. The register brings receipt dates and identifiers together with related purchase order and invoice references. Users can filter the list by party, review receipt amounts, and open the available actions for an existing goods receipt.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.5 Creating a goods receipt",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The receipt form links a supplier and purchase order, captures invoice information, and allows received items to be added. The form includes the selected supplier and purchase order, invoice details, and an area for adding received materials. These entries connect the receipt to the purchasing workflow and record the item quantities and values being received.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.6 Goods receipt financial summary",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The receipt summary displays received item values, discount, tax, and transport charges before the receipt is saved. The received item list appears above the financial summary, allowing its quantity and rate to be checked against the calculated amount. The user can review the total and additional charges before selecting Save Receipt.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.7 Editing a goods receipt",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "An existing receipt can be opened to review or update its invoice, item, and financial details and save the changes. The edit dialog retains the receipt references while presenting the item and financial fields for modification. The save changes control allows corrections to be recorded after the user reviews the revised details.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.5.8 Expanded goods receipt details",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The expanded receipt shows linked gate inward information and the received item quantities, rates, taxes, and totals. The expanded view separates the gate inward details from the receipt item summary. It lets users trace the received material to its inward record and inspect the quantity, unit rate, tax, and total associated with the receipt.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.6 BILL ENTRY",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Handles financial booking of supplier invoices against physically received goods, and records the verification of each booked bill before payment.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Book a supplier invoice against a received GRN: pick the party, then the linked gate inward / GRN; the voucher number (for example VCH-769) is generated automatically.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Capture party bill number, bill date, accounting date and purchase type; the narration is pre-filled (\u201cBeing Supply of \u2026 as per Bill no \u2026\u201d).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Show billed items (item, PO, quantity, rate, amount) taken from the GRN, with a financial breakdown: subtotal, discount, GST, IGST, VAT / CST, P&F, lorry freight, round off, TDS / TCS and grand total (bill amount).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Support both intra-state (CGST + SGST) and inter-state (IGST) tax amounts.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Three-way traceability: PO, GRN and bill are linked, so the ordered rate, the received quantity and the billed amount can be compared.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Duplicate bill check, edit, delete (with the linked chain) and print of the voucher.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Bill Verify: record the verification date, payment status and remarks for each booked bill.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "No double billing: the schema enforces one bill per GRN and per gate inward through unique keys.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Financial accuracy: all amounts are DECIMAL(15,2); the grand total is recomputed on the server.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Atomicity: bill header, billed lines and the chain delete run in one transaction.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Auditability: accounting date, voucher number, verification date and remarks are stored for each bill.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Print performance: a voucher renders in under 1 second.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency first \u2013 the accounts team must always see the same bill amount as the store.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.6.A Low-level architecture \u2013 BILL ENTRY",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "BillEntry.jsx asks billEntryController for parties that still have unbilled goods (getAvailableParties).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "After the party is chosen, available gate inwards and GRNs are listed; selecting one loads its items (getGRNDetails).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The user completes the bill details; save writes Bill_entries and Bill_entry_details in one transaction. The unique keys reject a second bill for the same GRN.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "BillVerify.jsx lists bills by party (getBillsByParty) and stores the verification record in bill_verify.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Print uses getPrintData to render the voucher.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are representative REST routes derived from the controller methods in the class diagram (Chapter 4).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Relationship: one GRN is billed by exactly one bill entry, and one bill entry is verified by one verification record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The bill_verify table is shown in the class diagram and ER diagram; its column list is not part of the Chapter 5 table screenshots.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.6.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.6.1 Bill entry register",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The bill register displays supplier invoice records, accounting dates, purchase types, and amounts, with print and maintenance controls. The table presents invoice numbers, party names, bill and accounting dates, purchase types, and amounts. Search and party filters help users locate an invoice, and the available actions support reviewing or maintaining a bill record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.6.2 Creating a supplier bill entry",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The bill form selects a supplier and receipt and captures invoice, accounting date, and purchase type details. The searchable party selector helps identify the vendor whose receipt will be billed. The remaining visible fields capture invoice and accounting information so the bill can be recorded with the appropriate transaction references.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.6.3 Bill entry financial breakdown",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The billing area shows item values and fields for discount, tax, freight, and other charges, along with the grand total. The item table is followed by a financial section containing discount, GST, packing and forwarding, freight, and round off fields. The displayed grand total provides a final value to check before the user saves the bill entry.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.6.4 Expanded bill entry details",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Expanding a bill reveals the linked inward records and billed line items for reviewing quantities, rates, and totals. The expanded row shows the supporting inward details and a separate table of billed items. This gives users a convenient view of the references, quantities, unit rates, and item totals supporting the invoice amount.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.7 MATERIAL REQUISITION & GATE PASS MOVEMENT",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Controls internal inventory consumption by departments and regulates the physical outbound / inbound movement of tools, machinery, and non-inventory goods through the gate.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Item Issue: create an issue voucher (for example ISS-0004) with date, department, indent number, approver / issued-by and remarks.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Show the department\u2019s items with available stock and a status badge (In stock, Low stock, Out of stock); the user enters an issue quantity that must not exceed the stock.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Filter the item list, see the count of selected items and total units, then confirm & save; the stock balance is reduced by the issued quantity.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Edit or delete an existing issue; list issues by department.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Gate Pass Out / In: record tools, machinery and non-inventory goods leaving or re-entering the premises with party, items and quantities.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Returnable (RGP) and non-returnable (NRGP) passes, and return reconciliation of items coming back against open passes.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Stock integrity: stock must never go negative \u2013 the quantity is validated on the server inside a transaction that locks the item rows being issued.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Concurrency: two storekeepers issuing the same item at the same moment are serialized by the row lock, so the second sees the reduced balance.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Usability: a department can have hundreds of items; the list is filterable and shows the remaining stock as the user types.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Accountability: each issue stores the department, indent number, approver and employee name for every line.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency first \u2013 an out-of-date stock figure would allow over-issue, so correctness outranks availability.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.7.A Low-level architecture \u2013 MATERIAL REQUISITION & GATE PASS MOVEMENT",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "ItemIssue.jsx loads departments and, when one is chosen, its items with current stock (getItemsByDepartment).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The user enters issue quantities; the page flags any quantity above the available stock.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Save sends header and lines; itemIssueController re-checks stock inside a transaction, writes Item_issue and Item_issue_detail, and reduces the item balance.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "GatePassOut.jsx / GatePassIn.jsx record movement; a returning item is matched against its open outward pass.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are representative REST routes derived from the controller methods in the class diagram (Chapter 4).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "The four gate pass models exist in the backend (Fig 8.1.6); their column definitions are not included in the Chapter 5 table screenshots.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Recommended addition: an index on Item_issue(Department, IssueDate) for the department-wise issue report.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.7.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.7.1 Creating a gate pass outward",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The outward gate pass form records pass details and destination information and allows items and quantities to be selected for movement. The upper form records the outward movement information, while the item selection area lists available materials and quantity fields. Users can assemble the materials for the pass and check the selected quantities before submitting the outward record.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.7.2 Editing a gate pass outward",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The edit form lets the user revise an existing outward gate pass, including its movement details and item quantities. The existing pass is reopened with its information and item selection controls visible. Users can review the recorded movement, adjust the relevant fields or quantities, and use the update control to retain the changes.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 2",
+    "text": "8.8 EXECUTIVE DASHBOARD & BUSINESS ANALYTICS",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.0 Purpose & Scope",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Provides operational transparency and business intelligence through live KPI monitoring and multi-criteria transactional report generation with spreadsheet and document exports.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.1 Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "What the module must do:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Dashboard KPI cards: active purchase orders, items in stock, gate passes outward and pending verifications, with a manual refresh.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Monthly transactions chart (POs, gate-in, gate-out), a status overview and the recent gate inward log.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Low-stock alerts: flag items whose stock has fallen to or below the configured minimum (OpeningQty \u2264 MinStockLevel).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Reports & Registers in six categories \u2013 Purchase, Billing, Receipt, Stock, Issue and Others \u2013 each with a named report (for example Department Wise Order Details, Date wise receipt register).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Filters: from / to date, report name, department (multi-select), party and item; preview on screen, then save.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Export: formatted Excel (.xlsx) workbooks built with ExcelJS, and printable PDF documents.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.2 Non-Functional Requirements",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "How well the module must do it (the system-wide baseline in the chapter introduction also applies):",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Read-only: the module never modifies transactional data, so it cannot corrupt stock or bills.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Performance: a one-year report completes in under 3 seconds and the dashboard in under 2 seconds.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Memory safety: large exports are streamed to the browser instead of being assembled fully in memory.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Freshness: figures reflect committed data; the Refresh button re-queries on demand rather than polling.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Scalability path: heavy reports can move to a MySQL read replica later without changing the API.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "CAP: consistency preferred \u2013 a report must match what the transaction screens show.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.3 Tech Stack",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.4 Back-of-the-Envelope Estimation",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "Figures marked \u201clive\u201d come from the running system; the rest are working assumptions used to size the design.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.5 Low-Level Architecture",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Fig 8.8.A Low-level architecture \u2013 EXECUTIVE DASHBOARD & BUSINESS ANALYTICS",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "Request flow:",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Dashboard.jsx calls the dashboard endpoints on load and on Refresh.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Reports.jsx sends the chosen report name, date range and department / party filters.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "reportController builds one SQL query per report, joins header and detail tables, groups by department or date, and returns rows for the on-screen grid.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Save Report asks the same controller to stream the rows into an ExcelJS workbook, which the browser downloads.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.6 API Design",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "All endpoints below are protected by the JWT middleware (auth.js) unless marked public. Paths are representative REST routes derived from the controller methods in the class diagram (Chapter 4).",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "None"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.7 DB Design",
+    "align": "None"
+  },
+  {
+    "style": "List Paragraph",
+    "text": "Recommended indexes for report speed as data grows: OrderDate, InwardDate, BillDate and IssueDate on their tables, and a computed check of Quantity against MinStockLevel for the low-stock alert.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": "Heading 3",
+    "text": "8.8.8 Screenshots",
+    "align": "None"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.8.1 Operational dashboard",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The dashboard summarizes store activity through metric cards, monthly charts, and recent purchase order records. The screen combines summary cards with charts and lists of recent store activity. It provides a consolidated overview that helps users identify current workload and inspect recent procurement information before opening a detailed transaction screen.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.8.2 Department wise issue report",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The report screen uses filters and selectable columns to generate a department wise item issue report and offers an Excel export. The report setup area provides date and entity filters together with a list of columns that can be included in the output. The generated table underneath presents the selected issue information, and the export control makes the result available for spreadsheet review.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "fig 8.8.3 Date wise order report",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The reporting screen displays order records for the selected criteria, including supplier and value details, with an Excel export option. The screen places report criteria above a table containing order dates, supplier details, and monetary values. Users can review the generated records for the chosen period and export the result for further comparison or record keeping.",
+    "align": "JUSTIFY (3)"
+  },
+  {
+    "style": null,
+    "text": "CHAPTER 9",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": "Heading 1",
+    "text": "CONCLUSION",
+    "align": "CENTER (1)"
+  },
+  {
+    "style": null,
+    "text": "The Store Management System provides a complete digital solution for managing the major activities involved in store and inventory operations. The system integrates master data management, purchase orders, gate inward entries, goods receipts, bill processing, item issues, gate passes, dashboards, and reports within a single application. By replacing manual records and disconnected processes, it improves the accuracy, consistency, and accessibility of operational information. The application was developed using React for the frontend, Node.js and Express for the backend, and MySQL with Sequelize for database management. Its client-server architecture supports structured communication between the user interface, application server, and database. JWT authentication, password hashing, role-based access control, request rate limiting, and protected routes help secure the system and prevent unauthorized access. The completed project demonstrates how a web-based information system can simplify store operations, reduce repetitive work, minimize recording errors, and improve decision-making. Its modular structure makes the application easier to maintain and allows additional features to be introduced in the future. Overall, the Store Management System successfully meets its objective of providing a secure, organized, and efficient platform for managing store activities at KR Exports.",
+    "align": "JUSTIFY (3)"
+  }
+]

@@ -53,7 +53,9 @@
     "farmer": "Farmer",
     "vendor": "Buyer / Business",
     "buyer": "Buyer",
-    "admin": "Administrator"
+    "admin": "Administrator",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundMsg": "The page you are looking for does not exist or has been moved."
   },
   "navigation": {
     "appName": "FarmConnect",

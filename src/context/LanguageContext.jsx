@@ -9,7 +9,29 @@ export const LANGUAGES = [
   { code: "en", label: "English" },
   { code: "ta", label: "தமிழ்" },
   { code: "hi", label: "हिन्दी" },
+  { code: "te", label: "తెలుగు" },
+  { code: "ml", label: "മലയാളം" },
+  { code: "kn", label: "ಕನ್ನಡ" },
+  { code: "mr", label: "मराठी" },
+  { code: "gu", label: "ગુજરાતી" },
+  { code: "bn", label: "বাংলা" },
+  { code: "pa", label: "ਪੰਜਾਬੀ" },
+  { code: "or", label: "ଓଡ଼ିଆ" },
+  { code: "as", label: "অসমীয়া" },
+  { code: "ur", label: "اردو" },
+  { code: "mai", label: "मैथिली" },
+  { code: "kok", label: "कोंकणी" },
+  { code: "sa", label: "संस्कृतम्" },
+  { code: "ne", label: "नेपाली" },
+  { code: "sd", label: "سنڌي" },
+  { code: "doi", label: "डोगरी" },
+  { code: "mni", label: "মৈতৈলোন্" },
+  { code: "sat", label: "ᱥᱟᱱᱛᱟᱲᱤ" },
+  { code: "brx", label: "बर'" },
+  { code: "ks", label: "كٲشُر" },
 ];
+
+const VALID_LANG_CODES = new Set(LANGUAGES.map((l) => l.code));
 
 // Client-side translation cache for missing strings dynamically requested via API
 const clientTranslationCache = new Map();
@@ -26,7 +48,7 @@ export function LanguageProvider({ children }) {
   const [, setTick] = useState(0);
 
   const setLang = useCallback((newLang) => {
-    if (!["en", "ta", "hi"].includes(newLang)) return;
+    if (!VALID_LANG_CODES.has(newLang)) return;
     setLangState(newLang);
     localStorage.setItem("farmconnect-language", newLang);
     localStorage.setItem("fc_lang", newLang);

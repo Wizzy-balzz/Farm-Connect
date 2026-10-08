@@ -1,0 +1,701 @@
+[
+  {
+    "table_index": 0,
+    "rows_count": 11,
+    "cols_count": 3,
+    "header": [
+      "Layer",
+      "Technology",
+      "Purpose"
+    ],
+    "sample_rows": [
+      [
+        "Frontend",
+        "React.js (Vite)",
+        "Single-page application with dynamic UI"
+      ],
+      [
+        "State Management",
+        "Redux Toolkit",
+        "Centralized application state"
+      ]
+    ]
+  },
+  {
+    "table_index": 1,
+    "rows_count": 4,
+    "cols_count": 3,
+    "header": [
+      "Layer",
+      "Technology",
+      "Purpose"
+    ],
+    "sample_rows": [
+      [
+        "Model",
+        "Sequelize ORM + MySQL",
+        "Defines data structure, handles DB queries, manages relationships and validations"
+      ],
+      [
+        "View",
+        "React.js + Redux",
+        "Renders the UI, manages user interaction, communicates with the server via Axios"
+      ]
+    ]
+  },
+  {
+    "table_index": 2,
+    "rows_count": 8,
+    "cols_count": 3,
+    "header": [
+      "Step",
+      "Question it answers",
+      "Presented in each module as"
+    ],
+    "sample_rows": [
+      [
+        "1. Functional requirements",
+        "What must the module do?",
+        "Section x.1"
+      ],
+      [
+        "2. Non-functional requirements",
+        "How fast, how big, how available? Where does the CAP trade-off fall?",
+        "Section x.2"
+      ]
+    ]
+  },
+  {
+    "table_index": 3,
+    "rows_count": 8,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Named users",
+        "\u2248 20",
+        "Store, purchase, accounts and management staff of one organization (assumption)"
+      ],
+      [
+        "Working days / year",
+        "300",
+        "Assumption"
+      ]
+    ]
+  },
+  {
+    "table_index": 4,
+    "rows_count": 6,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Password hashing",
+        "bcryptjs (salted)",
+        "Pure JavaScript, no native build step on the Jenkins/production server"
+      ],
+      [
+        "Session",
+        "JSON Web Token, 12 h",
+        "Stateless; the client keeps the token and sends it in the Authorization header"
+      ]
+    ]
+  },
+  {
+    "table_index": 5,
+    "rows_count": 7,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Users",
+        "\u2248 20 rows, < 10 KB",
+        "Assumption (\u2248 0.5 KB per row)"
+      ],
+      [
+        "Logins per day",
+        "\u2248 40",
+        "20 users \u00d7 about 2 logins (12-hour tokens)"
+      ]
+    ]
+  },
+  {
+    "table_index": 6,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "POST",
+        "/api/auth/login (public)",
+        "Body: username, password. Returns JWT bearer token and user profile (id, full_name, role). Rate limited."
+      ],
+      [
+        "POST",
+        "/api/auth/register",
+        "Admin only. Creates a user with a hashed password and a role."
+      ]
+    ]
+  },
+  {
+    "table_index": 7,
+    "rows_count": 2,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Users",
+        "PK id (auto increment) UNIQUE username",
+        "username varchar(100), password varchar(255) hash, full_name, email, role enum(admin, manager, operator, viewer) default operator, status enum(active, inactive) default active, last_login, createdAt, updatedAt"
+      ]
+    ]
+  },
+  {
+    "table_index": 8,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "List UI",
+        "React pages + EntityFilterPanel, SearchSelect, CustomSelect",
+        "One reusable filter and dropdown set for every master screen"
+      ],
+      [
+        "Server paging",
+        "Sequelize queries with limit / offset and where-filters",
+        "Keeps the response small even for the 11,011-row item catalog"
+      ]
+    ]
+  },
+  {
+    "table_index": 9,
+    "rows_count": 7,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Suppliers",
+        "5,490 rows \u2248 6.6 MB",
+        "Live count; \u2248 1.2 KB per row"
+      ],
+      [
+        "Items",
+        "11,011 rows \u2248 6.6 MB",
+        "Live count; \u2248 0.6 KB per row"
+      ]
+    ]
+  },
+  {
+    "table_index": 10,
+    "rows_count": 8,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/{master}",
+        "List with search, filters, sort, page and limit; returns rows and total count."
+      ],
+      [
+        "GET",
+        "/api/{master}/:id",
+        "One record by its primary key."
+      ]
+    ]
+  },
+  {
+    "table_index": 11,
+    "rows_count": 12,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Department",
+        "PK dept_id (auto) UNIQUE dept_name",
+        "dept_name varchar(100)"
+      ],
+      [
+        "Supplier Details",
+        "PK PartyCode varchar(30)",
+        "AccountName, Place, Address, DeliveryAddress, GSTNo, PanNumber, PhNo, Email, ContactPerson, OpeningCredit / OpeningDebit decimal(20,2)"
+      ]
+    ]
+  },
+  {
+    "table_index": 12,
+    "rows_count": 6,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Entry form",
+        "React modal with live calculation",
+        "The user sees line and grand totals while typing, before the PO is saved"
+      ],
+      [
+        "Numbers",
+        "MySQL DECIMAL(15,2) / (15,6)",
+        "Exact arithmetic for money and fractional unit rates"
+      ]
+    ]
+  },
+  {
+    "table_index": 13,
+    "rows_count": 9,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "POs to date",
+        "772",
+        "Live (latest PO-772)"
+      ],
+      [
+        "New POs per day",
+        "\u2264 15",
+        "Assumption (peak)"
+      ]
+    ]
+  },
+  {
+    "table_index": 14,
+    "rows_count": 9,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/purchase-orders",
+        "List with search, party, status, sort and paging; returns header, item count and grand total."
+      ],
+      [
+        "GET",
+        "/api/purchase-orders/:id",
+        "One PO with its lines (getPurchaseOrderById)."
+      ]
+    ]
+  },
+  {
+    "table_index": 15,
+    "rows_count": 4,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Purchase_orders",
+        "PK OrderNo bigint MUL PartyCode \u2192 Supplier",
+        "OrderDate, Address, Place, Remarks, RefNo, Total, Discount, GST, IGST, VAT_CST, P_F, LorryFreight, RoundOff, GrandTotal, Status (default Draft)"
+      ],
+      [
+        "Purchase_order_details",
+        "PK DetailId (auto) MUL OrderNo",
+        "ItemCode, Qty, UnitRate (15,6), DiscountPct / DiscountAmt, GSTType, SGST / CGST / IGST %, amounts, PF_Amount, LorryFreight, MRS_No, GrandTotal"
+      ]
+    ]
+  },
+  {
+    "table_index": 16,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Dependent dropdowns",
+        "React + SearchSelect",
+        "Selecting a party filters the PO list; selecting a PO loads its pending items"
+      ],
+      [
+        "Numbering",
+        "Server-side last-number look-up (getLastInwardNo, getLastGRNNo)",
+        "Sequential GI and GRN numbers shown in the form"
+      ]
+    ]
+  },
+  {
+    "table_index": 17,
+    "rows_count": 7,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Receipts to date",
+        "770 (GRN-260771 latest)",
+        "Live"
+      ],
+      [
+        "Gate inwards per year",
+        "\u2248 5,400",
+        "4,500 POs \u00d7 1.2 batches (assume 20 % are delivered in two parts)"
+      ]
+    ]
+  },
+  {
+    "table_index": 18,
+    "rows_count": 13,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/gate-inwards",
+        "List with search, party filter, sort, paging."
+      ],
+      [
+        "GET",
+        "/api/gate-inwards/last-no",
+        "Next inward number (getLastInwardNo)."
+      ]
+    ]
+  },
+  {
+    "table_index": 19,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Gate_inward",
+        "PK InwardNo (auto)",
+        "OrderNo, PartyCode, InwardDate, InvoiceNo, InvoiceDate, Status (default Draft)"
+      ],
+      [
+        "Gate_inward_details",
+        "PK DetailId (auto) MUL InwardNo",
+        "OrderNo, ItemCode, PendingQty, ReceivedQty"
+      ]
+    ]
+  },
+  {
+    "table_index": 20,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Source of truth",
+        "GRN lines copied into Bill_entry_details",
+        "The bill is built from received goods, not retyped"
+      ],
+      [
+        "Uniqueness",
+        "UNIQUE keys on GateInwardNo and GRNNo",
+        "Database-level guard against double billing"
+      ]
+    ]
+  },
+  {
+    "table_index": 21,
+    "rows_count": 7,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Bills to date",
+        "768 (VCH-769 latest)",
+        "Live"
+      ],
+      [
+        "Bills per year",
+        "\u2248 4,500",
+        "About one bill per GRN"
+      ]
+    ]
+  },
+  {
+    "table_index": 22,
+    "rows_count": 11,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/bill-entries",
+        "Register with party filter, sort and paging."
+      ],
+      [
+        "GET",
+        "/api/bill-entries/last-voucher-no",
+        "Next voucher number (getLastVoucherNo)."
+      ]
+    ]
+  },
+  {
+    "table_index": 23,
+    "rows_count": 4,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Bill_entries",
+        "PK VoucherNo (auto) UNIQUE GateInwardNo UNIQUE GRNNo",
+        "OrderNo, PartyCode, AccDate, PartyBillNo, BillDate, PurchaseType, BillAmount, TDS, Narration, Total, Discount, GST, IGST, VAT_CST, P_F, LorryFreight, RoundOff, TaxRndOff, GrandTotal, TCS, Status"
+      ],
+      [
+        "Bill_entry_details",
+        "PK DetailId (auto) MUL VoucherNo",
+        "OrderNo, ItemCode, Qty, UnitRate, TotalAmount"
+      ]
+    ]
+  },
+  {
+    "table_index": 24,
+    "rows_count": 5,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Stock check",
+        "Server-side validation + Sequelize transaction",
+        "Prevents over-issue and negative stock"
+      ],
+      [
+        "Item list",
+        "React table with live filter and remaining-stock indicator",
+        "Fast data entry for large catalogs"
+      ]
+    ]
+  },
+  {
+    "table_index": 25,
+    "rows_count": 8,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Issues per day",
+        "\u2248 30",
+        "Assumption (store with 31 departments)"
+      ],
+      [
+        "Issues per year",
+        "30 \u00d7 300 = 9,000",
+        "Derived"
+      ]
+    ]
+  },
+  {
+    "table_index": 26,
+    "rows_count": 8,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/item-issues",
+        "List issues with filters and paging."
+      ],
+      [
+        "GET",
+        "/api/item-issues/last-no",
+        "Next issue number (getLastIssueNo)."
+      ]
+    ]
+  },
+  {
+    "table_index": 27,
+    "rows_count": 4,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "Item_issue",
+        "PK IssueNo (auto)",
+        "IssueDate, IndentNo, Department, Approval, Remarks, Status (default Draft)"
+      ],
+      [
+        "Item_issue_detail",
+        "PK DetailId (auto) MUL IssueNo",
+        "ItemName, CatNo, DrawNo, Qty, UOM, EmpName, OpeningQty"
+      ]
+    ]
+  },
+  {
+    "table_index": 28,
+    "rows_count": 6,
+    "cols_count": 3,
+    "header": [
+      "Concern",
+      "Choice",
+      "Why it fits this module"
+    ],
+    "sample_rows": [
+      [
+        "Aggregation",
+        "Sequelize / SQL GROUP BY queries in dashboardController, reportController",
+        "Computes counts, monthly totals and department-wise sums in the database"
+      ],
+      [
+        "Charts",
+        "React dashboard components",
+        "Monthly bar chart and status bars"
+      ]
+    ]
+  },
+  {
+    "table_index": 29,
+    "rows_count": 7,
+    "cols_count": 3,
+    "header": [
+      "Quantity",
+      "Estimate",
+      "Basis"
+    ],
+    "sample_rows": [
+      [
+        "Dashboard load",
+        "\u2248 5\u20136 aggregate queries",
+        "KPIs, monthly series, recent log"
+      ],
+      [
+        "Dashboard loads per day",
+        "\u2248 100",
+        "20 users \u00d7 5 loads \u2192 \u2248 600 queries / day"
+      ]
+    ]
+  },
+  {
+    "table_index": 30,
+    "rows_count": 6,
+    "cols_count": 3,
+    "header": [
+      "Method",
+      "Endpoint",
+      "Purpose / contract"
+    ],
+    "sample_rows": [
+      [
+        "GET",
+        "/api/dashboard/summary",
+        "KPI counters: active POs, items in stock, gate passes, pending verifications."
+      ],
+      [
+        "GET",
+        "/api/dashboard/monthly",
+        "Monthly counts of POs, gate-in and gate-out."
+      ]
+    ]
+  },
+  {
+    "table_index": 31,
+    "rows_count": 3,
+    "cols_count": 3,
+    "header": [
+      "Table",
+      "Keys & indexes",
+      "Key columns"
+    ],
+    "sample_rows": [
+      [
+        "No new table",
+        "Read-only",
+        "Aggregated queries across the 29 tables via dashboardController.js and reportController.js"
+      ],
+      [
+        "Tables read",
+        "Purchase_orders (+details), Gate_inward, Receipts (+details), Bill_entries, Item, Item_issue (+detail), gate pass tables",
+        "Date columns OrderDate, InwardDate, BillDate, IssueDate drive the report filters"
+      ]
+    ]
+  }
+]

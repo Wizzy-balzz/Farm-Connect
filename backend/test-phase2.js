@@ -19,13 +19,13 @@ async function runPhase2Tests() {
   }
 
   // 1. Check DB Tables Exist
-  const tables = await query.all("SELECT name FROM sqlite_master WHERE type='table'");
+  const tables = await query.all("SELECT table_name AS name FROM information_schema.tables WHERE table_schema = DATABASE()");
   const tableNames = tables.map(t => t.name);
 
-  assert(tableNames.includes("ai_conversations"), "ai_conversations table exists in SQLite database");
-  assert(tableNames.includes("ai_messages"), "ai_messages table exists in SQLite database");
-  assert(tableNames.includes("ai_insights"), "ai_insights table exists in SQLite database");
-  assert(tableNames.includes("real_time_events"), "real_time_events table exists in SQLite database");
+  assert(tableNames.includes("ai_conversations"), "ai_conversations table exists in MySQL database");
+  assert(tableNames.includes("ai_messages"), "ai_messages table exists in MySQL database");
+  assert(tableNames.includes("ai_insights"), "ai_insights table exists in MySQL database");
+  assert(tableNames.includes("real_time_events"), "real_time_events table exists in MySQL database");
 
   // 2. Test Role-Aware AI Tool Permissions
   assert(isToolAllowed("farmer", "getMySales") === true, "Farmer can access getMySales tool");

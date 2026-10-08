@@ -5,16 +5,20 @@ import {
   fetchDistricts,
   fetchPlaces,
   searchLocations,
-  reverseGeocodeLocation
+  reverseGeocodeLocation,
+  normalizeLocation
 } from "../../services/locationService.js";
 import { Search, MapPin, Globe } from "../icons/Icons.jsx";
 import { Button } from "./Button.jsx";
+import { OsmLocationPicker } from "./OsmLocationPicker.jsx";
 
 export function GlobalLocationSelector({
   value = {},
   onChange,
   showAddressFields = false,
   allowSearchMode = true,
+  allowMapMode = true,
+  defaultMode = "map",
   disabled = false
 }) {
   const [countries, setCountries] = useState([]);
@@ -26,7 +30,7 @@ export function GlobalLocationSelector({
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingPlaces, setLoadingPlaces] = useState(false);
 
-  const [mode, setMode] = useState("dropdown"); // 'dropdown' | 'search'
+  const [mode, setMode] = useState(allowMapMode ? defaultMode : "dropdown"); // 'map' | 'dropdown' | 'search'
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -252,9 +256,19 @@ export function GlobalLocationSelector({
   return (
     <div className="fc-location-selector" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       {/* Mode Switch & Near Me Bar */}
-      {allowSearchMode && (
+      {(allowSearchMode || allowMapMode) && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: "6px" }}>
+            {allowMapMode && (
+              <button
+                type="button"
+                className={`fc-btn fc-btn-sm ${mode === "map" ? "fc-btn-primary" : "fc-btn-ghost"}`}
+                onClick={() => setMode("map")}
+                disabled={disabled}
+              >
+                🗺️ OpenStreetMap
+              </button>
+            )}
             <button
               type="button"
               className={`fc-btn fc-btn-sm ${mode === "dropdown" ? "fc-btn-primary" : "fc-btn-ghost"}`}
@@ -263,26 +277,40 @@ export function GlobalLocationSelector({
             >
               <Globe size={14} /> Cascading Select
             </button>
-            <button
-              type="button"
-              className={`fc-btn fc-btn-sm ${mode === "search" ? "fc-btn-primary" : "fc-btn-ghost"}`}
-              onClick={() => setMode("search")}
-              disabled={disabled}
-            >
-              <Search size={14} /> Search Place
-            </button>
+            {allowSearchMode && (
+              <button
+                type="button"
+                className={`fc-btn fc-btn-sm ${mode === "search" ? "fc-btn-primary" : "fc-btn-ghost"}`}
+                onClick={() => setMode("search")}
+                disabled={disabled}
+              >
+                <Search size={14} /> Search Place
+              </button>
+            )}
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleDetectLocation}
-            disabled={disabled || locating}
-          >
-            <MapPin size={14} /> {locating ? "Detecting..." : "Detect Location"}
-          </Button>
+          {mode !== "map" && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDetectLocation}
+              disabled={disabled || locating}
+            >
+              <MapPin size={14} /> {locating ? "Detecting..." : "Detect Location"}
+            </Button>
+          )}
         </div>
+      )}
+
+      {/* MAP MODE (Interactive OpenStreetMap + Leaflet + Draggable Pin + Current Location) */}
+      {mode === "map" && allowMapMode && (
+        <OsmLocationPicker
+          value={value}
+          onChange={(newLoc) => onChange?.(normalizeLocation(newLoc))}
+          disabled={disabled}
+          showAddressCard={true}
+        />
       )}
 
       {/* SEARCH MODE */}

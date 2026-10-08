@@ -84,6 +84,15 @@ export async function requireAuth(req, res, next) {
     next();
   } catch (err) {
     console.error("Auth middleware error:", err);
+    if (err && (err.code === "DATABASE_UNAVAILABLE" || err.originalCode === "ECONNREFUSED")) {
+      return res.status(503).json({
+        success: false,
+        error: {
+          code: "DATABASE_UNAVAILABLE",
+          message: "Database connection is unreachable. Please start your MySQL service."
+        }
+      });
+    }
     return res.status(500).json({
       success: false,
       error: {
@@ -109,12 +118,15 @@ export function requireRole(...allowedRoles) {
       });
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    const flatRoles = allowedRoles.flat(2).map((r) => String(r).toLowerCase());
+    const userRole = String(req.user.role || "").toLowerCase();
+
+    if (!flatRoles.includes(userRole)) {
       return res.status(403).json({
         success: false,
         error: {
           code: "FORBIDDEN",
-          message: `Access denied. Requires one of the following roles: ${allowedRoles.join(", ")}.`
+          message: `Access denied. Requires one of the following roles: ${flatRoles.join(", ")}.`
         }
       });
     }

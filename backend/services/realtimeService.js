@@ -68,7 +68,7 @@ export async function broadcastEventToUser(userId, eventName, data) {
   // 1. Store event in SQLite database for history/audit
   try {
     await query.run(
-      "INSERT INTO real_time_events (id, userId, event, data, read, createdAt) VALUES (?, ?, ?, ?, 0, ?)",
+      "INSERT INTO real_time_events (id, userId, event, data, `read`, createdAt) VALUES (?, ?, ?, ?, 0, ?)",
       [eventPayload.id, userId, eventName, JSON.stringify(data), eventPayload.createdAt]
     );
   } catch (err) {

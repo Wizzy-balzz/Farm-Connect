@@ -29,4 +29,12 @@ dist-ssr
 !.env.example
 *credential*.json
 *service-account*.json
+powershell.cmd
+
+# Backups
+backups/
+*.sql.gz
+*.sql.bak
+farmconnect_backup_*.sql
+
 

@@ -29,7 +29,14 @@ function initRealtimeConnection() {
     const handleMessage = (event, eventName) => {
       try {
         const parsed = JSON.parse(event.data);
-        listeners.forEach((cb) => cb({ event: eventName, data: parsed }));
+        const payloadData = (parsed && parsed.data !== undefined) ? { ...parsed, ...parsed.data } : parsed;
+        listeners.forEach((cb) => {
+          try {
+            cb({ event: eventName, data: payloadData });
+          } catch (cbErr) {
+            console.error("Realtime listener error:", cbErr);
+          }
+        });
       } catch {
         /* ignore parse errors */
       }
@@ -39,6 +46,8 @@ function initRealtimeConnection() {
     eventSource.addEventListener("order_status_change", (e) => handleMessage(e, "order_status_change"));
     eventSource.addEventListener("low_stock", (e) => handleMessage(e, "low_stock"));
     eventSource.addEventListener("new_review", (e) => handleMessage(e, "new_review"));
+    eventSource.addEventListener("chat:message", (e) => handleMessage(e, "chat:message"));
+    eventSource.addEventListener("chat:read", (e) => handleMessage(e, "chat:read"));
 
     eventSource.onerror = () => {
       // Reconnect automatically if closed

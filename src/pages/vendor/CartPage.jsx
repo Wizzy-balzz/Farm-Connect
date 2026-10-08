@@ -8,6 +8,7 @@ import { useData } from "../../hooks/useData.js";
 import { useCart } from "../../hooks/useCart.js";
 import { useLanguage } from "../../hooks/useLanguage.js";
 import { useNotifications } from "../../hooks/useNotifications.js";
+import { getUnitLabel } from "../../utils/controlledVocabulary.js";
 
 const CATEGORY_FALLBACKS = {
   Vegetables: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=120&q=80",
@@ -18,7 +19,7 @@ const CATEGORY_FALLBACKS = {
 };
 
 function CartPageBase() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { products } = useData();
   const { cart, updateQty, removeFromCart } = useCart();
   const { notifySuccess, notifyError } = useNotifications();
@@ -114,7 +115,7 @@ function CartPageBase() {
                     ) : (
                       <span>{formatCurrency(l.product.price)}</span>
                     )}
-                    {" "}/{l.product.unit} (MOQ: {l.product.moq} {l.product.unit})
+                    {" "}/{getUnitLabel(l.product.unit, lang)} (MOQ: {l.product.moq} {getUnitLabel(l.product.unit, lang)})
                   </div>
 
                   {hasDiscount && (
@@ -126,7 +127,7 @@ function CartPageBase() {
 
                 <div className="fc-qty-control" style={{ marginLeft: "auto", marginRight: 16 }}>
                   <button onClick={() => handleQtyChange(l.product, -1, l.qty, step)}><Minus /></button>
-                  <span style={{ minWidth: 60, textAlign: "center" }}>{l.qty} {l.product.unit}</span>
+                  <span style={{ minWidth: 60, textAlign: "center" }}>{l.qty} {getUnitLabel(l.product.unit, lang)}</span>
                   <button onClick={() => handleQtyChange(l.product, 1, l.qty, step)}><Plus /></button>
                 </div>
 

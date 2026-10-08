@@ -227,8 +227,8 @@ function CheckoutBase() {
         if (sdkLoaded && window.Razorpay) {
           const options = {
             key: paymentOrder.gatewayKeyId,
-            amount: Math.round(total * 100), // Amount in paise
-            currency: deliveryLocation.currency || "INR",
+            amount: Math.round(paymentOrder.amount * 100), // Authoritative amount from backend in paise
+            currency: paymentOrder.currency || deliveryLocation.currency || "INR",
             name: "FarmConnect B2B Marketplace",
             description: `B2B Procurement Order ${targetOrderId}`,
             order_id: paymentOrder.gatewayOrderId,
@@ -316,7 +316,7 @@ function CheckoutBase() {
       setDevPaymentModal({
         targetOrderId,
         gatewayOrderId: paymentOrder.gatewayOrderId,
-        amount: total,
+        amount: paymentOrder.amount || total,
         method: form.payment,
         orderPayload
       });
@@ -341,7 +341,7 @@ function CheckoutBase() {
           orderId: devPaymentModal.targetOrderId,
           gatewayOrderId: devPaymentModal.gatewayOrderId,
           gatewayPaymentId: `pay_test_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`,
-          gatewaySignature: "sig_verified_dev_test",
+          gatewaySignature: "dev_sandbox_signature_unverified",
           method: devPaymentModal.method
         })
       });
@@ -353,15 +353,16 @@ function CheckoutBase() {
           totalAmount: devPaymentModal.amount,
           address: devPaymentModal.orderPayload.deliveryAddress
         });
-        notifySuccess("Development Test Payment verified server-side! Order confirmed.");
+        notifySuccess("Payment verified server-side! Order confirmed.");
         setStep(4);
       } else {
-        notifyError("Server-side payment verification failed.");
+        const errMsg = verifyRes?.error?.message || verifyRes?.message || "Server rejected signature. Genuine Razorpay HMAC signature is enforced.";
+        notifyError(`Payment verification failed: ${errMsg}`);
         setPaymentState("FAILED");
       }
     } catch (err) {
       console.error("[Payment Debug]: Verification error:", err);
-      notifyError(err.message || "Failed to verify payment with server.");
+      notifyError(err.message || "Payment verification rejected by security policy.");
       setPaymentState("FAILED");
     } finally {
       setDevPaymentModal(null);
