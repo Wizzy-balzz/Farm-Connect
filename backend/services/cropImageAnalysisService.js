@@ -11,14 +11,25 @@ export const MAX_IMAGE_SIZE_MB = 10;
 export const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 export const MAX_IMAGE_FILE_SIZE_BYTES = MAX_IMAGE_SIZE_BYTES;
 export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+export const validateCropImage = (opts) => validateImageInput(opts);
 
 /**
  * Validates image buffer, size, MIME type, and magic bytes header
  */
-export function validateImageInput({ imageBuffer, mimeType }) {
+export function validateImageInput(inputArg, mimeTypeArg) {
+  let imageBuffer, mimeType;
+  if (Buffer.isBuffer(inputArg) || inputArg === null || inputArg === undefined) {
+    imageBuffer = inputArg;
+    mimeType = mimeTypeArg;
+  } else if (typeof inputArg === "object") {
+    imageBuffer = inputArg.imageBuffer;
+    mimeType = inputArg.mimeType;
+  }
+
   if (!imageBuffer || !Buffer.isBuffer(imageBuffer) || imageBuffer.length === 0) {
     return {
       valid: false,
+      code: "EMPTY_IMAGE",
       statusCode: 400,
       error: {
         code: "EMPTY_IMAGE",
@@ -30,6 +41,7 @@ export function validateImageInput({ imageBuffer, mimeType }) {
   if (imageBuffer.length > MAX_IMAGE_SIZE_BYTES) {
     return {
       valid: false,
+      code: "IMAGE_TOO_LARGE",
       statusCode: 413,
       error: {
         code: "IMAGE_TOO_LARGE",
@@ -38,10 +50,39 @@ export function validateImageInput({ imageBuffer, mimeType }) {
     };
   }
 
-  const cleanMime = (mimeType || "").split(";")[0].trim().toLowerCase();
-  if (!ALLOWED_MIME_TYPES.includes(cleanMime)) {
+  // Detect header magic bytes
+  let detectedMime = null;
+  if (imageBuffer.length >= 3 && imageBuffer[0] === 0xFF && imageBuffer[1] === 0xD8 && imageBuffer[2] === 0xFF) {
+    detectedMime = "image/jpeg";
+  } else if (imageBuffer.length >= 8 &&
+    imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50 && imageBuffer[2] === 0x4E && imageBuffer[3] === 0x47 &&
+    imageBuffer[4] === 0x0D && imageBuffer[5] === 0x0A && imageBuffer[6] === 0x1A && imageBuffer[7] === 0x0A) {
+    detectedMime = "image/png";
+  } else if (imageBuffer.length >= 12 &&
+    imageBuffer[0] === 0x52 && imageBuffer[1] === 0x49 && imageBuffer[2] === 0x46 && imageBuffer[3] === 0x46 &&
+    imageBuffer[8] === 0x57 && imageBuffer[9] === 0x45 && imageBuffer[10] === 0x42 && imageBuffer[11] === 0x50) {
+    detectedMime = "image/webp";
+  }
+
+  if (!detectedMime) {
     return {
       valid: false,
+      code: "UNSUPPORTED_IMAGE_FORMAT",
+      statusCode: 400,
+      error: {
+        code: "UNSUPPORTED_IMAGE_FORMAT",
+        message: "The uploaded file does not match valid image binary signatures."
+      }
+    };
+  }
+
+  const effectiveMime = (mimeType || detectedMime).split(";")[0].trim().toLowerCase();
+  const normalizedMime = effectiveMime === "image/jpg" ? "image/jpeg" : effectiveMime;
+
+  if (!ALLOWED_MIME_TYPES.includes(normalizedMime)) {
+    return {
+      valid: false,
+      code: "UNSUPPORTED_IMAGE_FORMAT",
       statusCode: 400,
       error: {
         code: "UNSUPPORTED_IMAGE_FORMAT",
@@ -50,40 +91,9 @@ export function validateImageInput({ imageBuffer, mimeType }) {
     };
   }
 
-  // Magic Bytes Header Inspection for actual file format verification
-  let isHeaderValid = false;
-
-  // JPEG: FF D8 FF
-  if (imageBuffer.length >= 3 && imageBuffer[0] === 0xFF && imageBuffer[1] === 0xD8 && imageBuffer[2] === 0xFF) {
-    isHeaderValid = true;
-  }
-  // PNG: 89 50 4E 47 0D 0A 1A 0A
-  else if (imageBuffer.length >= 8 &&
-    imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50 && imageBuffer[2] === 0x4E && imageBuffer[3] === 0x47 &&
-    imageBuffer[4] === 0x0D && imageBuffer[5] === 0x0A && imageBuffer[6] === 0x1A && imageBuffer[7] === 0x0A) {
-    isHeaderValid = true;
-  }
-  // WEBP: RIFF .... WEBP
-  else if (imageBuffer.length >= 12 &&
-    imageBuffer[0] === 0x52 && imageBuffer[1] === 0x49 && imageBuffer[2] === 0x46 && imageBuffer[3] === 0x46 &&
-    imageBuffer[8] === 0x57 && imageBuffer[9] === 0x45 && imageBuffer[10] === 0x42 && imageBuffer[11] === 0x50) {
-    isHeaderValid = true;
-  }
-
-  if (!isHeaderValid) {
-    return {
-      valid: false,
-      statusCode: 400,
-      error: {
-        code: "CORRUPTED_OR_INVALID_FILE",
-        message: "The uploaded file does not match valid image binary signatures."
-      }
-    };
-  }
-
   return {
     valid: true,
-    mimeType: cleanMime === "image/jpg" ? "image/jpeg" : cleanMime
+    mimeType: normalizedMime
   };
 }
 

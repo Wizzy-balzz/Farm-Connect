@@ -1,37 +1,17 @@
 {
-  "name": "my-react-app",
+  "name": "myi-react-app-workspace",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "backend": "npm install --prefix backend && npm start --prefix backend",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "dev": "npm run dev --prefix frontend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm start --prefix backend",
+    "build": "npm run build --prefix frontend",
+    "lint": "npm run lint --prefix frontend",
+    "test:backend": "node backend/tests/test-all-phases.js",
     "db:backup": "node scripts/backup-mysql.js",
     "db:restore": "node scripts/restore-mysql.js",
     "db:verify-backup": "node scripts/verify-backup.js"
-  },
-  "dependencies": {
-    "@react-oauth/google": "^0.13.5",
-    "i18next": "^26.3.6",
-    "leaflet": "^1.9.4",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "react-i18next": "^17.0.11",
-    "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.18.4"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.4",
-    "eslint": "^10.8.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "globals": "^17.7.0",
-    "vite": "^8.2.0"
   }
 }

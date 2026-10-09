@@ -50,7 +50,7 @@ export function validateAudioInput({ audioBuffer, mimeType }) {
     return {
       valid: false,
       error: {
-        code: "INVALID_AUDIO_FORMAT",
+        code: "UNSUPPORTED_AUDIO_FORMAT",
         message: `Unsupported audio format '${mimeType}'. Supported formats: webm, ogg, mp4, wav, mp3, m4a.`
       }
     };
@@ -75,6 +75,16 @@ export async function transcribeAudio({
     return {
       success: false,
       error: validation.error
+    };
+  }
+
+  if (provider && !["mock", "python", "gemini", "local", "whisper"].includes(provider)) {
+    return {
+      success: false,
+      error: {
+        code: "UNKNOWN_PROVIDER",
+        message: `Unknown STT provider '${provider}'.`
+      }
     };
   }
 
